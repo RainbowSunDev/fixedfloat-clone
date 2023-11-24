@@ -8,7 +8,7 @@ import { BsArrowRight, BsArrowLeft  } from 'react-icons/bs'
 export default function Home() {
   return (
     <main className="w-full relative ">
-      <section className="flex flex-col items-center bg-dashboardbg bg-bottom bg-no-repeat w-full h-screen">
+      <section className="flex flex-col items-center bg-dashboardbg bg-bottom bg-cover bg-no-repeat w-full h-screen">
         <header className=" w-full px-8">
           <div className="flex justify-between border-b-[1px] border-b-slate-600 py-3">
             <a href="https://" className="flex items-center ">
