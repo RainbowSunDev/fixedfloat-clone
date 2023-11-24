@@ -18,7 +18,7 @@ const config: Config = {
         'dashboardbg': "url(/images/dashboard.svg)",
       },
       backgroundSize: {
-        '120': '120%',
+        '120': '100%',
       }
     },
   },

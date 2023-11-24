@@ -118,7 +118,7 @@ export default function Home() {
           </div>
         </header>
         <div className="flex flex-row items-center justify-center z-10">
-          <div className="my-10 sm:my-[60px] ">
+          <div className="my-8 sm:my-[60px] ">
             <h1 className='text-center text-xl sm:text-[2em] md:text-[2.6em] font-semibold text-white'>Lightning cryptocurrency exchange</h1>
             <div>
               <div className="flex flex-col md:flex-row justify-between items-center mt-16 lg:mt-24">
