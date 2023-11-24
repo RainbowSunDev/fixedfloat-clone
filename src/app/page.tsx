@@ -8,12 +8,12 @@ import { BsArrowRight, BsArrowLeft  } from 'react-icons/bs'
 export default function Home() {
   return (
     <main className="w-full relative ">
-      <section className="flex flex-col items-center bg-dashboardbg bg-contain  w-full h-screen">
+      <section className="flex flex-col items-center bg-dashboardbg bg-bottom bg-no-repeat w-full h-screen">
         <header className=" w-full px-8">
           <div className="flex justify-between border-b-[1px] border-b-slate-600 py-3">
             <a href="https://" className="flex items-center ">
                 <span className="self-center text-2xl font-semibold whitespace-nowrap text-hover mr-2">Fixed</span>
-                <img src="https://flowbite.com/docs/images/logo.svg" className="h-8" alt="Flowbite Logo" />
+                <Image src="https://flowbite.com/docs/images/logo.svg" width={30} height={30} alt="FixedFloat Logo" />
                 <span className="self-center text-2xl font-semibold whitespace-nowrap text-white ml-2">Float</span>
             </a>
 
@@ -56,7 +56,7 @@ export default function Home() {
                 <OrderTypeToggle />
               </div>
               <div className='px-16 mt-4 text-slate-400 text-sm'>
-                By using the site and creating an exchange, you agree to the FixedFloat's
+                <span>By using the site and creating an exchange, you agree to the FixedFloat`s</span>
                 <span className=""><a className="text-blue-500 hover:border-b-[1px] hover:border-blue-500" href="http://"> Terms of Sevices</a></span> and 
                 <span><a href="" className="text-blue-500 hover:border-b-[1px] hover:border-blue-500"> Privacy Policy</a></span>
               </div>

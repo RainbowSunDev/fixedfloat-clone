@@ -1,10 +1,17 @@
 import React, { useState, useEffect } from 'react';
-
+import Image from 'next/image';
 // Assume currencies have an additional 'icon' field with the path to their respective icons.
 const currencies = [
-  { name: 'Bitcoin', ticker: 'BTC', icon: 'path-to-btc-icon' },
-  { name: 'Ethereum', ticker: 'ETH', icon: 'path-to-eth-icon' },
-  // ...add other currencies with their icons
+  { code: "", coin: "BTC", network: "BTC", name: 'Bitcoin', recv: true, send: true, tag:null, logo: 'https://fixedfloat.com/assets/images/coins/svg/btc.svg' },
+  { code: "", coin: "ETH", network: "BTC", name: 'Ethereum', recv: true, send: true, tag:null, logo: 'https://fixedfloat.com/assets/images/coins/svg/eth.svg' },
+  { code: "", coin: "BTC", network: "BTC", name: 'Bitcoin', recv: true, send: true, tag:null, logo: 'https://fixedfloat.com/assets/images/coins/svg/btc.svg' },
+  { code: "", coin: "ETH", network: "BTC", name: 'Ethereum', recv: true, send: true, tag:null, logo: 'https://fixedfloat.com/assets/images/coins/svg/eth.svg' },
+  { code: "", coin: "BTC", network: "BTC", name: 'Bitcoin', recv: true, send: true, tag:null, logo: 'https://fixedfloat.com/assets/images/coins/svg/btc.svg' },
+  { code: "", coin: "ETH", network: "BTC", name: 'Ethereum', recv: true, send: true, tag:null, logo: 'https://fixedfloat.com/assets/images/coins/svg/eth.svg' },
+  { code: "", coin: "BTC", network: "BTC", name: 'Bitcoin', recv: true, send: true, tag:null, logo: 'https://fixedfloat.com/assets/images/coins/svg/btc.svg' },
+  { code: "", coin: "ETH", network: "BTC", name: 'Ethereum', recv: true, send: true, tag:null, logo: 'https://fixedfloat.com/assets/images/coins/svg/eth.svg' },
+  { code: "", coin: "BTC", network: "BTC", name: 'Bitcoin', recv: true, send: true, tag:null, logo: 'https://fixedfloat.com/assets/images/coins/svg/btc.svg' },
+  { code: "", coin: "ETH", network: "BTC", name: 'Ethereum', recv: true, send: true, tag:null, logo: 'https://fixedfloat.com/assets/images/coins/svg/eth.svg' },
 ];
 
 const CurrencyInputDropdown = () => {
@@ -62,7 +69,10 @@ const CurrencyInputDropdown = () => {
             }}
             className={`flex items-center px-4 ${isSelectActive ? 'bg-[#29315C]' : 'bg-black'} text-white rounded-r-md text-xl transition ease-in-out `}
           >
-            {selectedCurrency.ticker}
+            <span className='mr-1'>
+             <Image src="https://fixedfloat.com/assets/images/coins/svg/btc.svg" width={30} height={30} alt="Bitcoin" />
+            </span>
+            {selectedCurrency.coin}
             <span className="ml-2">▼</span>
           </button>
         </div>
@@ -74,8 +84,14 @@ const CurrencyInputDropdown = () => {
                 onClick={() => handleCurrencyClick(currency)}
                 className="px-4 py-2 cursor-pointer hover:bg-[#3a447c] flex items-center justify-between  transition ease-in-out delay-150 text-white"
               >
-                <img src={currency.icon} alt="" className="w-4 h-4 mr-2" />
-                {currency.name}
+                <span className='flex items-center mr-1'>
+                  <Image src={currency.logo} width={30} height={30} alt="Bitcoin" />
+                  <span className='ml-2'>
+                    {currency.name}
+                  </span>
+
+                </span>
+                {currency.coin}
               </li>
             ))}
           </ul>
