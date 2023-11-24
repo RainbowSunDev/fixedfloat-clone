@@ -28,7 +28,7 @@ const OrderTypeToggle = () => {
 
         </div>
         <div className="mt-3 sm:mt-0">
-            <button className="text-xs sm:text-lg sm:text-white sm:font-bold py-3 px-10 sm:py-4 sm:px-12 bg-blue-500 hover:bg-blue-700  rounded transition-all">
+            <button className="text-xs text-white sm:text-lg sm:font-bold py-3 px-10 sm:py-4 sm:px-12 bg-blue-500 hover:bg-blue-700  rounded transition-all">
                 Exchange now
             </button>
         </div>
