@@ -13,6 +13,7 @@ const CurrencyInputDropdown = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredCurrencies, setFilteredCurrencies] = useState(currencies);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [isSelectActive, setIsSelectActive] = useState(false);
 
   useEffect(() => {
     // Filter currencies based on the search query
@@ -42,33 +43,36 @@ const CurrencyInputDropdown = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center bg-red-500">
-      <div className="relative w-full max-w-lg">
-        <div className="flex">
+    <div className="flex flex-col items-center justify-center">
+      <div className="relative w-full max-w-lg ">
+        <div className={`flex ${isSelectActive ? 'border-b-[1px] border-b-slate-600 ' : 'border-[1px] border-white rounded-md'}`}>
           <input
             type="number"
             inputMode="decimal" // Brings up the numeric keyboard on mobile devices
             pattern="[0-9]*" // This pattern restricts input to numbers only (integer numbers)
             value={inputValue}
             onChange={handleInputChange}
-            className="flex-grow p-2 bg-purple-800 text-white rounded-l-md focus:outline-none text-xl py-4"
+            className={`flex-grow p-2 ${isSelectActive ? 'bg-[#29315C]' : 'bg-black'} text-white rounded-l-md focus:outline-none text-xl py-4 transition ease-in-out `}
             placeholder="Enter amount"
           />
           <button
-            onClick={() => setShowDropdown(!showDropdown)}
-            className="flex items-center px-4 bg-purple-800 text-white rounded-r-md text-xl"
+            onClick={() => {
+              setShowDropdown(!showDropdown);
+              setIsSelectActive(!isSelectActive); // Toggle the background color when the button is clicked
+            }}
+            className={`flex items-center px-4 ${isSelectActive ? 'bg-[#29315C]' : 'bg-black'} text-white rounded-r-md text-xl transition ease-in-out `}
           >
             {selectedCurrency.ticker}
             <span className="ml-2">▼</span>
           </button>
         </div>
         {showDropdown && (
-          <ul className="absolute w-full bg-purple-800 rounded-b-md shadow-lg z-10">
+          <ul className="absolute w-full bg-[#29315C] rounded-b-md shadow-lg z-10">
             {filteredCurrencies.map((currency, index) => (
               <li
                 key={index}
                 onClick={() => handleCurrencyClick(currency)}
-                className="px-4 py-2 cursor-pointer hover:bg-purple-600 flex items-center justify-between py-3"
+                className="px-4 py-2 cursor-pointer hover:bg-[#3a447c] flex items-center justify-between  transition ease-in-out delay-150 text-white"
               >
                 <img src={currency.icon} alt="" className="w-4 h-4 mr-2" />
                 {currency.name}

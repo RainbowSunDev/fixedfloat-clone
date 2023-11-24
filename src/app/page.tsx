@@ -1,17 +1,20 @@
 'use client'
 import Image from 'next/image'
 import CurrencyInputDropdown from '@/components/CurrencyInput';
+import CoinAddressInput from '@/components/CoinAddressInput';
+import OrderTypeToggle from '@/components/OrderTypeToggle';
+import { BsArrowRight, BsArrowLeft  } from 'react-icons/bs'
 
 export default function Home() {
   return (
     <main className="w-full relative ">
-      <section className="flex flex-col items-center bg-dashboardbg bg-no-repeat bg-center bg-cover w-full bg-white">
+      <section className="flex flex-col items-center bg-dashboardbg bg-contain  w-full h-screen">
         <header className=" w-full px-8">
-          <div className="flex justify-between border-b-[1px] border-b-slate-600 py-4">
+          <div className="flex justify-between border-b-[1px] border-b-slate-600 py-3">
             <a href="https://" className="flex items-center ">
-                <span className="self-center text-3xl font-semibold whitespace-nowrap text-hover mr-2">Fixed</span>
+                <span className="self-center text-2xl font-semibold whitespace-nowrap text-hover mr-2">Fixed</span>
                 <img src="https://flowbite.com/docs/images/logo.svg" className="h-8" alt="Flowbite Logo" />
-                <span className="self-center text-3xl font-semibold whitespace-nowrap text-white ml-2">Float</span>
+                <span className="self-center text-2xl font-semibold whitespace-nowrap text-white ml-2">Float</span>
             </a>
 
             <button data-collapse-toggle="headerbar-default" type="button" className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600" aria-controls="navbar-default" aria-expanded="false">
@@ -30,13 +33,32 @@ export default function Home() {
             </div>
           </div>
         </header>
-        <div className="flex justify-center h-[400px]">
-          <div className="min-w-[890px] my-[70px] w-full">
-            <h1 className='text-center text-[2.6em] font-semibold text-white mb-[34px]'>Lightning cryptocurrency exchange</h1>
+        <div className="flex justify-center">
+          <div className="min-w-[890px] my-[60px] w-full">
+            <h1 className='text-center text-[2.6em] font-semibold text-white'>Lightning cryptocurrency exchange</h1>
             <div>
-              <div className="flex flex-row justify-between">
+              <div className="flex flex-row justify-between items-center mt-24">
                 <CurrencyInputDropdown />
+                <button className='text-xl font-extrabold text-center mb-6 '>
+                  <div className="ml-2 mb-[-10px] text-white">
+                    <BsArrowRight /> 
+                  </div>
+                  <div className='mr-2  text-white'>
+                    <BsArrowLeft />
+                  </div>
+                </button>
                 <CurrencyInputDropdown />
+              </div>
+              <div className="mt-14">
+                <CoinAddressInput />
+              </div>
+              <div className="mt-10">
+                <OrderTypeToggle />
+              </div>
+              <div className='px-16 mt-4 text-slate-400 text-sm'>
+                By using the site and creating an exchange, you agree to the FixedFloat's
+                <span className=""><a className="text-blue-500 hover:border-b-[1px] hover:border-blue-500" href="http://"> Terms of Sevices</a></span> and 
+                <span><a href="" className="text-blue-500 hover:border-b-[1px] hover:border-blue-500"> Privacy Policy</a></span>
               </div>
             </div>
           </div>
