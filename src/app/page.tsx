@@ -1,65 +1,22 @@
 'use client'
 import Image from 'next/image';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import CurrencyInputDropdown from '@/components/CurrencyInput';
 import CoinAddressInput from '@/components/CoinAddressInput';
 import OrderTypeToggle from '@/components/OrderTypeToggle';
 import { BsArrowRight, BsArrowLeft  } from 'react-icons/bs'
 import axios from 'axios';
-import { Currency, ExtendedCurrency } from '@/types';
-import { FromToCurrency } from '@/types';
-// Assume currencies have an additional 'icon' field with the path to their respective icons.
-// const currencies = [
-//   { code: "", coin: "BTC", network: "BTC", name: 'Bitcoin', recv: true, send: true, tag:null, logo: 'https://fixedfloat.com/assets/images/coins/svg/btc.svg', color:"text-[#f7931a]", priority: "5" },
-//   { code: "", coin: "ETH", network: "BTC", name: 'Ethereum', recv: true, send: true, tag:null, logo: 'https://fixedfloat.com/assets/images/coins/svg/eth.svg', color:"text-white", priority: "5" },
-//   { code: "", coin: "BTC", network: "BTC", name: 'Bitcoin', recv: true, send: true, tag:null, logo: 'https://fixedfloat.com/assets/images/coins/svg/btc.svg', color:"text-[#f7931a]", priority: "5" },
-//   { code: "", coin: "ETH", network: "BTC", name: 'Ethereum', recv: true, send: true, tag:null, logo: 'https://fixedfloat.com/assets/images/coins/svg/eth.svg', color:"text-white", priority: "5" },
-//   { code: "", coin: "BTC", network: "BTC", name: 'Bitcoin', recv: true, send: true, tag:null, logo: 'https://fixedfloat.com/assets/images/coins/svg/btc.svg', color:"text-[#f7931a]", priority: "5" },
-//   { code: "", coin: "ETH", network: "BTC", name: 'Ethereum', recv: true, send: true, tag:null, logo: 'https://fixedfloat.com/assets/images/coins/svg/eth.svg', color:"text-white", priority: "5" }
-// ];
-
-// Initialize the state with default UI properties
-const defaultFromCurrency: ExtendedCurrency = { 
-  code: "", 
-  coin: "BTC", 
-  network: "BTC", 
-  name: 'Bitcoin', 
-  recv: true, 
-  send: true, 
-  tag:null, 
-  logo: 'https://fixedfloat.com/assets/images/coins/svg/btc.svg', 
-  color:"text-[#f7931a]", 
-  priority: "5", 
-  borderColor: 'border-blue-500', // Replace with actual default color
-  textColor: 'text-blue-500'
-}
-
-const defaultToCurrency: ExtendedCurrency = {
-  code: "", 
-  coin: "ETH", 
-  network: "ETH", 
-  name: 'Ethereum', 
-  recv: true, 
-  send: true, 
-  tag:null, 
-  logo: 'https://fixedfloat.com/assets/images/coins/svg/eth.svg', 
-  color:"text-[#f7931a]", 
-  priority: "5", 
-  borderColor: 'border-blue-500', 
-  textColor: 'text-blue-500'
-};
+import { Currency, FromToCurrency, ExchangeRateRequestData, ExchangeRateResponseData } from '@/types';
 
 export default function Home() {
+
+  const [amount, setAmount] = useState<number | null>(null);
+  const [isFixedRate, setIsFixedRate] = useState(true);
+  const [isFrom, setIsFrom] = useState(true);
+
   const [currencies, setCurrencies] = useState<Currency[] | null>(null);
-
-  // State for "from" currency
-  // const [fromCurrency, setFromCurrency] = useState<Currency | null>(null);
-  // // State for "to" currency
-  // const [toCurrency, setToCurrency] = useState<Currency | null>(null);
+  const [exchangeRateData, setExchangeRateData] = useState<ExchangeRateResponseData | null>(null);
   const [fromToCurrency, setFromToCurrency] = useState<FromToCurrency | null>(null);
-
-  const [parentSelectedCurrency, setParentSelectedCurrency] = useState<Currency | null>(null);
-
   const [fixedSelectedCurrencyColor, setFixedSelectedCurrencyColor] = useState<string>();
   const [floatSelectedCurrencyColor, setFloatSelectedCurrencyColor] = useState<string>();
 
@@ -74,7 +31,7 @@ export default function Home() {
             },
           }
         );
-        console.log("response", response)
+        console.log("availableData:", response.data)
         setCurrencies(response.data);
         const fromToCurrencyInitialData: FromToCurrency = {
           fromCurrency: response.data[0],
@@ -91,56 +48,222 @@ export default function Home() {
     }
     getAvailbaleCurrencies();
   }, [])
-  useEffect(() => {
 
-    if (currencies && !parentSelectedCurrency && currencies.length > 0) {
-      setParentSelectedCurrency(currencies[0]);
+  const onGetExchangeRate = useCallback(async (requestData: ExchangeRateRequestData) => {
+    console.log("currencies3", currencies)
+    try {
+      const response = await axios.post(
+        '/api/get-exchange-rate',
+        {
+          ...requestData,
+          ccies: true
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      console.log("exchageData2----response", response.data)
+      console.log("currencies2", currencies)
+      if(response.data?.data){
+        setExchangeRateData(response.data)
+      
+        const { ccies:data } = response.data.data;
+        const newCurrencies = currencies && data && currencies.map((currency: Currency) => {
+          const targetCurrency = data.find((value: any) => 
+            currency.code === value.code
+          );
+        
+          if (targetCurrency) {
+            return {
+              ...currency,
+              recv: targetCurrency.recv,
+              send: targetCurrency.send
+            };
+          } else {
+            // If targetCurrency is not found, return the original currency object
+            return currency;
+          }
+        });
+        if(newCurrencies){
+          setCurrencies(newCurrencies)
+        }
+        console.error(newCurrencies)
+      }
+      
+    } catch (error) {
+      console.error("error", error)
     }
+  }, []);
+
+  useEffect(() => {
+    console.log("currencies66", currencies)
     
-  }, [parentSelectedCurrency]);
+    const onGetExchangeRate = async (requestData: ExchangeRateRequestData) => {
+      try {
+        const response = await axios.post(
+          '/api/get-exchange-rate',
+          {
+            ...requestData,
+            ccies: true
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+        console.log("exchageData1----response", response.data)
+
+        if(response.data?.data){
+          setExchangeRateData(response.data)
+        
+          const { ccies:data } = response.data.data;
+          const newCurrencies = currencies && data && currencies.map((currency: Currency) => {
+            const targetCurrency = data.find((value: any) => 
+              currency.code === value.code
+            );
+          
+            if (targetCurrency) {
+              return {
+                ...currency,
+                recv: targetCurrency.recv,
+                send: targetCurrency.send
+              };
+            } else {
+              // If targetCurrency is not found, return the original currency object
+              return currency;
+            }
+          });
+          if(newCurrencies){
+            setCurrencies(newCurrencies)
+          }
+          console.error(newCurrencies)
+        }
+      } catch (error) {
+        console.error("error", error)
+      }
+    }
+
+    if(fromToCurrency && amount) {
+      const newRequestData: ExchangeRateRequestData = {
+        type: isFixedRate ? "fixed" : "float",
+        fromCcy: fromToCurrency.fromCurrency.code,
+        toCcy: fromToCurrency.toCurrency.code,
+        direction: "from",
+        amount: amount
+      }
+      onGetExchangeRate(newRequestData);
+    }
+
+  }, [amount, isFixedRate, onGetExchangeRate])
 
   const handleFixedCurrencyColor = (fixedCurrencyColor: string) => {
-    setFixedSelectedCurrencyColor(fixedCurrencyColor)
+    setFixedSelectedCurrencyColor(fixedCurrencyColor);
   }
 
   const handleFloatCurrencyColor = (floatCurrencyColor: string) => {
     setFloatSelectedCurrencyColor(floatCurrencyColor)
   }
+
   // Handler for swapping the currencies
   const handleSwapCurrencies = () => {
-    // Swap the "from" and "to" currencies
-    const tempColor = fixedSelectedCurrencyColor;
-    setFixedSelectedCurrencyColor(floatSelectedCurrencyColor);
-    setFloatSelectedCurrencyColor(tempColor)
     
-    if(fromToCurrency) {
+    if(fromToCurrency && exchangeRateData?.data.from.amount) {
+      const tempColor = fixedSelectedCurrencyColor;
+      setFixedSelectedCurrencyColor(floatSelectedCurrencyColor);
+      setFloatSelectedCurrencyColor(tempColor)
       const newFromToCurrencyData: FromToCurrency = {
         fromCurrency: fromToCurrency.toCurrency,
         toCurrency: fromToCurrency.fromCurrency,
         direction: !fromToCurrency.direction
       };
-      setFromToCurrency(newFromToCurrencyData)
+      setFromToCurrency(newFromToCurrencyData);
+      setIsFrom(!isFrom)
     }
   }
+
   const handleSetFromCurrency = (fromCurrency: Currency) => {
-    if(fromToCurrency) {
-      const newFromToCurrencyData: FromToCurrency = {
-        ...fromToCurrency,
-        fromCurrency: fromCurrency
-      };
-      setFromToCurrency(newFromToCurrencyData)
+    console.log("currencies11:", currencies)
+    let newFromToCurrencyData: FromToCurrency;
+    if(fromToCurrency && currencies) {
+      const toCurrency = fromToCurrency.toCurrency;
+      const tetherCurrency =toCurrency.name !== "Tether (ERC20)" ? currencies.find((currency: Currency) => currency.name === "Tether (ERC20)") : currencies.find((currency: Currency) => currency.name === "Bitcoin");
+      
+      if(fromCurrency.name === toCurrency.name && tetherCurrency) {
+        newFromToCurrencyData = {
+          ...fromToCurrency,
+          fromCurrency: fromCurrency,
+          toCurrency: tetherCurrency
+        };
+        setFloatSelectedCurrencyColor(tetherCurrency.color);
+        
+      }else {
+        newFromToCurrencyData = {
+          ...fromToCurrency,
+          fromCurrency: fromCurrency
+        };
+      }
+      console.log("newFromToCurrencyData",newFromToCurrencyData)
+      setFromToCurrency(newFromToCurrencyData);
+
+      if(exchangeRateData){
+        if(newFromToCurrencyData && amount) {
+          const newRequestData: ExchangeRateRequestData = {
+            type: isFixedRate ? "fixed" : "float",
+            fromCcy: fromCurrency.code,
+            toCcy: newFromToCurrencyData.toCurrency.code,
+            direction: "from",
+            amount: amount
+          }
+          console.log("currencies44:", currencies)
+  
+          onGetExchangeRate(newRequestData);
+        }
+      }
     }
+
   }
+
   const handleSetToCurrency = (toCurrency: Currency) => {
-    if(fromToCurrency) {
-      const newFromToCurrencyData: FromToCurrency = {
-        ...fromToCurrency,
-        toCurrency: toCurrency
-      };
+    if(fromToCurrency && currencies) {
+      const fromCurrency = fromToCurrency.fromCurrency;
+      const tetherCurrency = fromCurrency.name !== "Tether (ERC20)" ? currencies.find((currency) => currency.name === "Tether (ERC20)") : currencies.find((currency) => currency.name === "Bitcoin");
+
+      let newFromToCurrencyData: FromToCurrency;
+      if(toCurrency.name === fromCurrency.name && tetherCurrency) {
+        newFromToCurrencyData = {
+          ...fromToCurrency,
+          toCurrency: toCurrency,
+          fromCurrency: tetherCurrency
+        };
+        setFixedSelectedCurrencyColor(tetherCurrency.color);
+
+      }else {
+        newFromToCurrencyData = {
+          ...fromToCurrency,
+          toCurrency: toCurrency
+        };
+      }
       setFromToCurrency(newFromToCurrencyData)
+
+      if(exchangeRateData){
+        if(newFromToCurrencyData && amount) {
+          const newRequestData: ExchangeRateRequestData = {
+            type: isFixedRate ? "fixed" : "float",
+            fromCcy: newFromToCurrencyData.fromCurrency.code,
+            toCcy: toCurrency.code,
+            direction: "from",
+            amount: amount
+          }
+          onGetExchangeRate(newRequestData);
+        }
+      }
     }
+
   }
-  console.log("fromtocurrency", fromToCurrency)
+
   return (
     <main className="w-screen ">
       <div className="flex flex-col items-center w-full h-screen relative">
@@ -153,10 +276,13 @@ export default function Home() {
               <div className="flex flex-col md:flex-row justify-between items-center mt-16 lg:mt-24">
                 <CurrencyInputDropdown 
                   currencies={currencies} 
+                  selectedCurrency={fromToCurrency && fromToCurrency.fromCurrency}
+                  currecyDetail={exchangeRateData && exchangeRateData.data.from}
+                  type="editable"
                   onSwapCurrencies={handleSwapCurrencies}
                   onSetArrowColor={handleFixedCurrencyColor}
-                  fromToCurrency={fromToCurrency && fromToCurrency.fromCurrency}
-                  onSetCurrencyCurrency={handleSetFromCurrency}
+                  onSetCurrentCurrency={handleSetFromCurrency}
+                  onSetAmount={setAmount}
                 />
                 <button className='text-lg sm:text-xl font-extrabold text-center mb-6 sm:mx-6' onClick={() => handleSwapCurrencies()}>
                   <div className={`ml-2  ${fromToCurrency?.fromCurrency?.color ?? "text-white"}`} style={{ color: fixedSelectedCurrencyColor }}>
@@ -168,10 +294,12 @@ export default function Home() {
                 </button>
                 <CurrencyInputDropdown 
                   currencies={currencies} 
+                  selectedCurrency={fromToCurrency && fromToCurrency.toCurrency}
+                  currecyDetail={exchangeRateData && exchangeRateData.data.to}
                   onSwapCurrencies={handleSwapCurrencies}
                   onSetArrowColor={handleFloatCurrencyColor}
-                  fromToCurrency={fromToCurrency && fromToCurrency.toCurrency}
-                  onSetCurrencyCurrency={handleSetToCurrency}
+                  onSetCurrentCurrency={handleSetToCurrency}
+                  onSetAmount={setAmount}
 
                 />
               </div>
@@ -181,7 +309,35 @@ export default function Home() {
                 />
               </div>
               <div className="mt-10">
-                <OrderTypeToggle />
+              <div className="flex flex-col sm:flex-row items-center justify-between ">
+              <div className="flex flex-col sm:flex-row sm:items-center rounded-lg">
+                  <div className="text-xs sm:text-base text-white sm:mr-4 hidden sm:block">Order type</div>
+                  <div className="">
+                      <button
+                          onClick={() => setIsFixedRate(true)}
+                          className={`text-xs sm:text-base py-3 px-8 sm:py-4 rounded-l-lg  ${isFixedRate ? 'border-[1px]' : 'bg-[rgba(0,0,0,0.5)]'} text-white transition-all`}
+                      >
+                          Fixed rate (1.0%)
+                      </button>
+                      <button
+                          onClick={() => setIsFixedRate(false)}
+                          className={`text-xs sm:text-base py-3 px-8 sm:py-4 rounded-r-lg ${!isFixedRate ? 'border-[1px]' : 'bg-[rgba(0,0,0,0.5)]'} text-white mr-2 transition-all`}
+                      >
+                          Float rate (0.5%)
+                      </button>
+                  </div>
+                  <div className="flex flex-row items-center justify-start mt-1 sm:mt-0">
+                      <button className="rounded-full text-white w-6 h-6 bg-[rgba(0,0,0,0.5)] ">?</button>
+                      <span className='block sm:hidden text-slate-300 text-xs'>What is the difference?</span>
+                  </div>
+
+              </div>
+              <div className="mt-3 sm:mt-0">
+                  <button className="text-xs text-white sm:text-lg sm:font-bold py-3 px-10 sm:py-4 sm:px-12 bg-blue-500 hover:bg-blue-700  rounded transition-all">
+                      Exchange now
+                  </button>
+              </div>
+          </div>
               </div>
               
             </div>

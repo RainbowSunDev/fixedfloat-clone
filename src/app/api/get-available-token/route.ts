@@ -5,13 +5,12 @@ const crypto = require('crypto');
 
 export async function GET(request: NextRequest) {
     // return
-    console.log("GET", process.env.NEXT_PUBLIC_FIXEDFLOAT_API_KEY)
     const method: string = "ccies";
     try {
         const response = await getCurrencies(method);
-        const updatedCurrencies = response.data.map((currency: Currency) => ({
+        const updatedCurrencies = response.data.map((currency) => ({
             ...currency,
-            color: `${currency.color}`
+            color: `${currency.color}`,
           }));
           const currencies = [...updatedCurrencies].sort((a, b) => parseInt(b.priority) - parseInt(a.priority));
         return NextResponse.json(currencies, { status: 200 });
@@ -38,7 +37,6 @@ const getCurrencies = async (method: string, params = {}) : Promise<AvailableCur
 
     try {
         const response = await axios.post(url, data, { headers });
-        console.log("response.data[0]:", response.data.data[0])
         return response.data;
     } catch (error) {
         throw new Error('Webhook error', { cause: error });

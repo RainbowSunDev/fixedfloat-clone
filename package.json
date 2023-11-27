@@ -10,10 +10,12 @@
     "format": "prettier --write \"**/*.{ts,tsx,md,json}\""
   },
   "dependencies": {
+    "@types/lodash": "^4.14.202",
     "axios": "^1.6.2",
     "crypto": "^1.0.1",
     "dotenv": "^16.3.1",
     "format": "^0.2.2",
+    "lodash": "^4.17.21",
     "next": "14.0.3",
     "react": "^18",
     "react-dom": "^18",

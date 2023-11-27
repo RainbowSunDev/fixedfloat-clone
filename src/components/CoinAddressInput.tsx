@@ -15,7 +15,6 @@ const CoinAddressInput = ({toCurrencyData}: CoinAddressInputProps) => {
 
 
   useEffect(() => {
-    console.log("ToCurrencyData",toCurrencyData)
     if (toCurrencyData) {
       setToCurrency(toCurrencyData);
     }

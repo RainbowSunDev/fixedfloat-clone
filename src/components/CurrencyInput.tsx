@@ -1,20 +1,23 @@
-import React, { useState, useEffect, KeyboardEvent } from 'react';
+import React, { useState, useEffect, KeyboardEvent, useCallback } from 'react';
 import Image from 'next/image';
-import { Currency, FromToCurrency } from '@/types';
-
+import { Currency, CurrencyDetail } from '@/types';
+import { debounce } from "lodash"
 
 // Define a type for the component props
 type CurrencyInputDropdownProps = {
   currencies: Currency[] | null;
-  fromToCurrency: Currency | null;
+  selectedCurrency: Currency | null;
+  currecyDetail: CurrencyDetail | null;
+  type?: string
   onSwapCurrencies: () => void;
   onSetArrowColor: (color: string) => void;
-  onSetCurrencyCurrency: (currency: Currency) => void;
+  onSetCurrentCurrency: (currency: Currency) => void;
+  onSetAmount: (amount: number) => void;
 };
 
-const CurrencyInputDropdown = ({ onSetCurrencyCurrency, currencies, onSetArrowColor, fromToCurrency }: CurrencyInputDropdownProps) => {
+const CurrencyInputDropdown = ({ currecyDetail, type, onSetCurrentCurrency, currencies, onSetArrowColor, selectedCurrency, onSetAmount }: CurrencyInputDropdownProps) => {
   // current my selected currency
-  const [selectedCurrency, setSelectedCurrency] = useState<Currency | null>(null);
+  // const [selectedCurrency, setSelectedCurrency] = useState<Currency | null>(null);
   const [inputValue, setInputValue] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [filteredCurrencies, setFilteredCurrencies] = useState<Currency[] | null>(currencies);
@@ -22,43 +25,45 @@ const CurrencyInputDropdown = ({ onSetCurrencyCurrency, currencies, onSetArrowCo
   const [isSelectActive, setIsSelectActive] = useState<boolean>(false);
 
   useEffect(() => {
-    console.log("useEffect")
-    if (fromToCurrency) {
-      setSelectedCurrency(fromToCurrency);
-    }
+    // if (fromToCurrency) {
+    //   setSelectedCurrency(fromToCurrency);
+    // }
     // Filter currencies based on the search query
     const lowercasedQuery = searchQuery.toLowerCase();
-    console.log(typeof currencies)
-    console.log("currencies",currencies)
+    console.log("ahahah:", currencies)
     if(currencies) {
       const filtered = currencies.filter(currency =>
         currency.name.toLowerCase().includes(lowercasedQuery)
       );
       setFilteredCurrencies(filtered);
     }
-  }, [searchQuery, fromToCurrency, selectedCurrency]);
+  }, [searchQuery, selectedCurrency]);
 
-  const calculateValue = (currency: Currency): string => {
-    // Placeholder for calculation logic
-    // Replace with actual calculation
-    return `Calculated value for ${currency.name}`;
-  };
+  useEffect(() => {
+    if(currecyDetail){
+      setInputValue(currecyDetail.amount);
+    }
+    
+  }, [currecyDetail]);
+  
 
   const handleCurrencyClick = (currency: Currency) => {
-    setInputValue(calculateValue(currency)); // Set the calculated value
     setShowDropdown(false);
     setSearchQuery(''); // Reset the search query
     onSetArrowColor(currency.color);
-    onSetCurrencyCurrency(currency)
+    onSetCurrentCurrency(currency)
+    // onSetAmount(parseFloat(inputValue))
   };
 
+  const setProps = useCallback(debounce((data) => {
+    // props.setCrypto({amount: data, type: selection});
+    onSetAmount(parseFloat(data))
+  }, 700), []);
+
   const handleInputChange = (e:React.ChangeEvent<HTMLInputElement>) => {
-    console.log(e.target.value)
     const value = e.target.value;
-    if(value[value.length - 1] === "e" || value[value.length - 1] === "E"){
-      setInputValue(value.slice(0, value.length - 1))
-    }
     setInputValue(value);
+    setProps(value)
   };
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     // Prevent 'e', 'E', '+', '-', and '.' from being entered
@@ -81,7 +86,8 @@ const CurrencyInputDropdown = ({ onSetCurrencyCurrency, currencies, onSetArrowCo
             onKeyDown={handleKeyDown}
             className={`flex-grow  ${isSelectActive ? 'bg-[#29315C]' : 'bg-black'} rounded-l-md focus:outline-none text-lg sm:text-xl py-1 px-2 sm:py-4 transition ease-in-out `}
             style={{ color: selectCurrencyColor }}
-            placeholder="Enter amount"
+            placeholder=""
+            readOnly={type ? false : true}
           />
           <button
             onClick={() => {
@@ -108,23 +114,33 @@ const CurrencyInputDropdown = ({ onSetCurrencyCurrency, currencies, onSetArrowCo
           <ul className="absolute w-full max-h-72 bg-[#29315C] rounded-b-md shadow-lg z-50 overflow-y-auto">
             {filteredCurrencies && filteredCurrencies.map((currency, index) => (
               <li
-                key={index}
-                onClick={() => {
+              key={index}
+              onClick={() => {
+                if (currency.recv && type) {
                   handleCurrencyClick(currency);
-                  setIsSelectActive(!isSelectActive); // Toggle the background color when the button is clicked
-                }}
-                className={`px-4 py-2 cursor-pointer ${selectCurrencyColor} hover:bg-[#3a447c] flex items-center justify-between transition ease-in-out delay-150 `}
-                style={{ color: currency.color }}
-                
-              >
-                <span className='flex items-center mr-1'>
-                  <Image src={currency.logo} width={30} height={30} alt={currency.name} />
-                  <span className='ml-2'>
-                    {currency.name}
-                  </span>
+                  setIsSelectActive(!isSelectActive);
+                } else if (currency.send && !type) {
+                  console.log("!type", !type)
+                  handleCurrencyClick(currency);
+                  setIsSelectActive(!isSelectActive);
+                }
+              }}
+              className={`px-4 py-2 cursor-pointer ${selectCurrencyColor} flex items-center justify-between transition ease-in-out delay-150 ${
+                (currency.recv && type) || (currency.send && !type) ? 'hover:bg-[#3a447c]' : 'opacity-50 cursor-not-allowed'
+              }`}
+              style={{ 
+                color: currency.color,
+                pointerEvents: (currency.recv && type) || (currency.send) ? 'auto' : 'none'
+              }}
+            >
+              <span className='flex items-center mr-1'>
+                <Image src={currency.logo} width={30} height={30} alt={currency.name} />
+                <span className='ml-2'>
+                  {currency.name}
                 </span>
-                {currency.coin}
-              </li>
+              </span>
+              {currency.coin}
+            </li>
             ))}
           </ul>
         )}
