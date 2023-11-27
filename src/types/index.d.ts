@@ -70,3 +70,79 @@ export type CurrencyDetail = {
   max: string;
   usd: string;
 }
+
+export type CreateOrderRequestData = {
+  type: string;
+  fromCcy: string;
+  toCcy: string;
+  direction: string;
+  amount: number;
+  toAddress: string;
+  tag?: boolean;
+  refcode?: string;
+  afftax?: number;
+}
+
+export type OrderStatus =
+  | "NEW"
+  | "PENDING"
+  | "EXCHANGE"
+  | "WITHDRAW"
+  | "DONE"
+  | "EXPIRED"
+  | "EMERGENCY";
+
+type Transaction = {
+  id: string;
+  amount: string;
+  fee: string;
+  ccyfee: string;
+  timeReg: number;
+  timeBlock: number;
+  confirmations: number;
+};
+type CurrencyDetails = {
+  code: string;
+  coin: string;
+  network: string;
+  name: string;
+  alias: string;
+  amount: string;
+  address: string;
+  tag?: string;
+  addressMix?: string;
+  reqConfirmations?: number;
+  maxConfirmations?: number;
+  tx?: Transaction;
+};
+type TimeDetails = {
+  reg: number;
+  start: number;
+  finish: number;
+  update: number;
+  expiration: number;
+  left: number;
+};
+
+type EmergencyDetails = {
+  status: string[];
+  choice: string;
+  repeat: boolean;
+};
+
+export type CreateOrderResponse = {
+  code: number;
+  msg: string;
+  data: {
+    token: string;
+    id: string;
+    type: string;
+    email: string;
+    status: string;
+    time: TimeDetails;
+    from: CurrencyDetails;
+    to: CurrencyDetails;
+    back?: CurrencyDetails;
+    emergency?: EmergencyDetails;
+  };
+};

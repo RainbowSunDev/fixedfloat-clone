@@ -6,13 +6,15 @@ import CoinAddressInput from '@/components/CoinAddressInput';
 import OrderTypeToggle from '@/components/OrderTypeToggle';
 import { BsArrowRight, BsArrowLeft  } from 'react-icons/bs'
 import axios from 'axios';
-import { Currency, FromToCurrency, ExchangeRateRequestData, ExchangeRateResponseData } from '@/types';
+import { Currency, FromToCurrency, ExchangeRateRequestData, ExchangeRateResponseData, CreateOrderRequestData } from '@/types';
 
+const direction = "from"
 export default function Home() {
 
   const [amount, setAmount] = useState<number | null>(null);
   const [isFixedRate, setIsFixedRate] = useState(true);
   const [isFrom, setIsFrom] = useState(true);
+  const [address, setAddress] = useState<string | null>(null);
 
   const [currencies, setCurrencies] = useState<Currency[] | null>(null);
   const [exchangeRateData, setExchangeRateData] = useState<ExchangeRateResponseData | null>(null);
@@ -151,7 +153,7 @@ export default function Home() {
         type: isFixedRate ? "fixed" : "float",
         fromCcy: fromToCurrency.fromCurrency.code,
         toCcy: fromToCurrency.toCurrency.code,
-        direction: "from",
+        direction: direction,
         amount: amount
       }
       onGetExchangeRate(newRequestData);
@@ -190,7 +192,7 @@ export default function Home() {
             type: isFixedRate ? "fixed" : "float",
             fromCcy: newFromToCurrencyData.fromCurrency.code,
             toCcy: newFromToCurrencyData.toCurrency.code,
-            direction: "from",
+            direction: direction,
             amount: parseFloat(amount)
           }
           onGetExchangeRate(newRequestData);
@@ -229,7 +231,7 @@ export default function Home() {
             type: isFixedRate ? "fixed" : "float",
             fromCcy: fromCurrency.code,
             toCcy: newFromToCurrencyData.toCurrency.code,
-            direction: "from",
+            direction: direction,
             amount: amount
           }
           console.log("currencies44:", currencies)
@@ -269,7 +271,7 @@ export default function Home() {
             type: isFixedRate ? "fixed" : "float",
             fromCcy: newFromToCurrencyData.fromCurrency.code,
             toCcy: toCurrency.code,
-            direction: "from",
+            direction: direction,
             amount: amount
           }
           onGetExchangeRate(newRequestData);
@@ -279,6 +281,37 @@ export default function Home() {
 
   }
 
+  const handleExchange = async () => {
+    console.log(address)
+    let requestData: CreateOrderRequestData;
+    if(fromToCurrency && amount && address) {
+      requestData = {
+        type: isFixedRate ? "fixed" : "float",
+        fromCcy: fromToCurrency.fromCurrency.code,
+        toCcy: fromToCurrency.toCurrency.code,
+        direction: direction,
+        amount: amount,
+        toAddress: address 
+      }
+    try {
+      const response = await axios.post(
+        '/api/create-order',
+        {
+          ...requestData
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      console.log(response);
+      // Handle the response data
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  }
+  }
   return (
     <main className="w-screen ">
       <div className="flex flex-col items-center w-full h-screen relative">
@@ -321,6 +354,7 @@ export default function Home() {
               <div className="mt-10 sm:mt-14">
                 <CoinAddressInput 
                   toCurrencyData={fromToCurrency && fromToCurrency.toCurrency}
+                  setAddress={setAddress}
                 />
               </div>
               <div className="mt-10">
@@ -348,7 +382,7 @@ export default function Home() {
 
               </div>
               <div className="mt-3 sm:mt-0">
-                  <button className="text-xs text-white sm:text-lg sm:font-bold py-3 px-10 sm:py-4 sm:px-12 bg-blue-500 hover:bg-blue-700  rounded transition-all">
+                  <button className="text-xs text-white sm:text-lg sm:font-bold py-3 px-10 sm:py-4 sm:px-12 bg-blue-500 hover:bg-blue-700  rounded transition-all" onClick={handleExchange}>
                       Exchange now
                   </button>
               </div>
