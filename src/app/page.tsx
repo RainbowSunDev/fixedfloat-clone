@@ -5,16 +5,18 @@ import CurrencyInputDropdown from '@/components/CurrencyInput';
 import CoinAddressInput from '@/components/CoinAddressInput';
 import OrderTypeToggle from '@/components/OrderTypeToggle';
 import { BsArrowRight, BsArrowLeft  } from 'react-icons/bs'
+import axios from 'axios';
 import { Currency, ExtendedCurrency } from '@/types';
+import { FromToCurrency } from '@/types';
 // Assume currencies have an additional 'icon' field with the path to their respective icons.
-const currencies = [
-  { code: "", coin: "BTC", network: "BTC", name: 'Bitcoin', recv: true, send: true, tag:null, logo: 'https://fixedfloat.com/assets/images/coins/svg/btc.svg', color:"text-[#f7931a]", priority: "5" },
-  { code: "", coin: "ETH", network: "BTC", name: 'Ethereum', recv: true, send: true, tag:null, logo: 'https://fixedfloat.com/assets/images/coins/svg/eth.svg', color:"text-white", priority: "5" },
-  { code: "", coin: "BTC", network: "BTC", name: 'Bitcoin', recv: true, send: true, tag:null, logo: 'https://fixedfloat.com/assets/images/coins/svg/btc.svg', color:"text-[#f7931a]", priority: "5" },
-  { code: "", coin: "ETH", network: "BTC", name: 'Ethereum', recv: true, send: true, tag:null, logo: 'https://fixedfloat.com/assets/images/coins/svg/eth.svg', color:"text-white", priority: "5" },
-  { code: "", coin: "BTC", network: "BTC", name: 'Bitcoin', recv: true, send: true, tag:null, logo: 'https://fixedfloat.com/assets/images/coins/svg/btc.svg', color:"text-[#f7931a]", priority: "5" },
-  { code: "", coin: "ETH", network: "BTC", name: 'Ethereum', recv: true, send: true, tag:null, logo: 'https://fixedfloat.com/assets/images/coins/svg/eth.svg', color:"text-white", priority: "5" }
-];
+// const currencies = [
+//   { code: "", coin: "BTC", network: "BTC", name: 'Bitcoin', recv: true, send: true, tag:null, logo: 'https://fixedfloat.com/assets/images/coins/svg/btc.svg', color:"text-[#f7931a]", priority: "5" },
+//   { code: "", coin: "ETH", network: "BTC", name: 'Ethereum', recv: true, send: true, tag:null, logo: 'https://fixedfloat.com/assets/images/coins/svg/eth.svg', color:"text-white", priority: "5" },
+//   { code: "", coin: "BTC", network: "BTC", name: 'Bitcoin', recv: true, send: true, tag:null, logo: 'https://fixedfloat.com/assets/images/coins/svg/btc.svg', color:"text-[#f7931a]", priority: "5" },
+//   { code: "", coin: "ETH", network: "BTC", name: 'Ethereum', recv: true, send: true, tag:null, logo: 'https://fixedfloat.com/assets/images/coins/svg/eth.svg', color:"text-white", priority: "5" },
+//   { code: "", coin: "BTC", network: "BTC", name: 'Bitcoin', recv: true, send: true, tag:null, logo: 'https://fixedfloat.com/assets/images/coins/svg/btc.svg', color:"text-[#f7931a]", priority: "5" },
+//   { code: "", coin: "ETH", network: "BTC", name: 'Ethereum', recv: true, send: true, tag:null, logo: 'https://fixedfloat.com/assets/images/coins/svg/eth.svg', color:"text-white", priority: "5" }
+// ];
 
 // Initialize the state with default UI properties
 const defaultFromCurrency: ExtendedCurrency = { 
@@ -48,33 +50,97 @@ const defaultToCurrency: ExtendedCurrency = {
 };
 
 export default function Home() {
+  const [currencies, setCurrencies] = useState<Currency[] | null>(null);
+
   // State for "from" currency
-  const [fromCurrency, setFromCurrency] = useState<ExtendedCurrency | null>(null);
-  // State for "to" currency
-  const [toCurrency, setToCurrency] = useState<ExtendedCurrency | null>(null);
+  // const [fromCurrency, setFromCurrency] = useState<Currency | null>(null);
+  // // State for "to" currency
+  // const [toCurrency, setToCurrency] = useState<Currency | null>(null);
+  const [fromToCurrency, setFromToCurrency] = useState<FromToCurrency | null>(null);
 
   const [parentSelectedCurrency, setParentSelectedCurrency] = useState<Currency | null>(null);
 
+  const [fixedSelectedCurrencyColor, setFixedSelectedCurrencyColor] = useState<string>();
+  const [floatSelectedCurrencyColor, setFloatSelectedCurrencyColor] = useState<string>();
+
   useEffect(() => {
-    if (!parentSelectedCurrency && currencies.length > 0) {
+    const getAvailbaleCurrencies = async () => {
+      try {
+        const response = await axios.get(
+          '/api/get-available-token',
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+        console.log("response", response)
+        setCurrencies(response.data);
+        const fromToCurrencyInitialData: FromToCurrency = {
+          fromCurrency: response.data[0],
+          toCurrency: response.data[1],
+          direction: true
+        }
+        setFromToCurrency(fromToCurrencyInitialData);
+        
+        setFixedSelectedCurrencyColor(fromToCurrencyInitialData?.fromCurrency?.color);
+        setFloatSelectedCurrencyColor(fromToCurrencyInitialData?.toCurrency?.color);
+      } catch (error) {
+        console.error("error", error)
+      }
+    }
+    getAvailbaleCurrencies();
+  }, [])
+  useEffect(() => {
+
+    if (currencies && !parentSelectedCurrency && currencies.length > 0) {
       setParentSelectedCurrency(currencies[0]);
     }
     
   }, [parentSelectedCurrency]);
 
-  const handleCurrencyChange = (currency: Currency) => {
-    setParentSelectedCurrency(currency);
-  };
+  const handleFixedCurrencyColor = (fixedCurrencyColor: string) => {
+    setFixedSelectedCurrencyColor(fixedCurrencyColor)
+  }
 
+  const handleFloatCurrencyColor = (floatCurrencyColor: string) => {
+    setFloatSelectedCurrencyColor(floatCurrencyColor)
+  }
   // Handler for swapping the currencies
   const handleSwapCurrencies = () => {
     // Swap the "from" and "to" currencies
-    setFromCurrency(toCurrency);
-    setToCurrency(fromCurrency);
-  };
-
-  const selectCurrencyColor = parentSelectedCurrency ? parentSelectedCurrency.color : 'text-white';
-
+    const tempColor = fixedSelectedCurrencyColor;
+    setFixedSelectedCurrencyColor(floatSelectedCurrencyColor);
+    setFloatSelectedCurrencyColor(tempColor)
+    
+    if(fromToCurrency) {
+      const newFromToCurrencyData: FromToCurrency = {
+        fromCurrency: fromToCurrency.toCurrency,
+        toCurrency: fromToCurrency.fromCurrency,
+        direction: !fromToCurrency.direction
+      };
+      setFromToCurrency(newFromToCurrencyData)
+    }
+  }
+  const handleSetFromCurrency = (fromCurrency: Currency) => {
+    if(fromToCurrency) {
+      const newFromToCurrencyData: FromToCurrency = {
+        ...fromToCurrency,
+        fromCurrency: fromCurrency
+      };
+      setFromToCurrency(newFromToCurrencyData)
+    }
+  }
+  const handleSetToCurrency = (toCurrency: Currency) => {
+    if(fromToCurrency) {
+      const newFromToCurrencyData: FromToCurrency = {
+        ...fromToCurrency,
+        toCurrency: toCurrency
+      };
+      setFromToCurrency(newFromToCurrencyData)
+    }
+  }
+  console.log("fromtocurrency", fromToCurrency)
   return (
     <main className="w-screen ">
       <div className="flex flex-col items-center w-full h-screen relative">
@@ -86,34 +152,33 @@ export default function Home() {
             <div>
               <div className="flex flex-col md:flex-row justify-between items-center mt-16 lg:mt-24">
                 <CurrencyInputDropdown 
-                  parentSelectedCurrency={fromCurrency}
-                  onSetCurrencyChange={setFromCurrency} 
                   currencies={currencies} 
-                  borderColor={fromCurrency?.borderColor}
-                  textColor={fromCurrency?.textColor}
-                  onCurrencyChange={handleCurrencyChange} 
                   onSwapCurrencies={handleSwapCurrencies}
+                  onSetArrowColor={handleFixedCurrencyColor}
+                  fromToCurrency={fromToCurrency && fromToCurrency.fromCurrency}
+                  onSetCurrencyCurrency={handleSetFromCurrency}
                 />
                 <button className='text-lg sm:text-xl font-extrabold text-center mb-6 sm:mx-6' onClick={() => handleSwapCurrencies()}>
-                  <div className={`ml-2  ${toCurrency?.color ?? "text-white"}`}>
+                  <div className={`ml-2  ${fromToCurrency?.fromCurrency?.color ?? "text-white"}`} style={{ color: fixedSelectedCurrencyColor }}>
                     <BsArrowRight /> 
                   </div>
-                  <div className={`mr-2  ${fromCurrency?.color ?? "text-white"}`}>
+                  <div className={`mr-2  ${fromToCurrency?.toCurrency?.color ?? "text-white"}`} style={{ color: floatSelectedCurrencyColor }}>
                     <BsArrowLeft />
                   </div>
                 </button>
                 <CurrencyInputDropdown 
-                  parentSelectedCurrency={toCurrency}
-                  onSetCurrencyChange={setToCurrency} 
                   currencies={currencies} 
-                  borderColor={toCurrency?.borderColor}
-                  textColor={toCurrency?.textColor} 
-                  onCurrencyChange={handleCurrencyChange} 
                   onSwapCurrencies={handleSwapCurrencies}
+                  onSetArrowColor={handleFloatCurrencyColor}
+                  fromToCurrency={fromToCurrency && fromToCurrency.toCurrency}
+                  onSetCurrencyCurrency={handleSetToCurrency}
+
                 />
               </div>
               <div className="mt-10 sm:mt-14">
-                <CoinAddressInput />
+                <CoinAddressInput 
+                  toCurrencyData={fromToCurrency && fromToCurrency.toCurrency}
+                />
               </div>
               <div className="mt-10">
                 <OrderTypeToggle />

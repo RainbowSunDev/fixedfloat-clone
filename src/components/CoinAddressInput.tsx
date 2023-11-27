@@ -1,9 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { BsQrCodeScan, BsClipboard  } from 'react-icons/bs'
+import { Currency, FromToCurrency } from '@/types';
 
-const CoinAddressInput = () => {
+// Define a type for the component props
+type CoinAddressInputProps = {
+  toCurrencyData: Currency | null;
+};
+
+
+const CoinAddressInput = ({toCurrencyData}: CoinAddressInputProps) => {
   const [inputValue, setInputValue] = useState('');
+  const [toCurrency, setToCurrency] = useState<Currency | null>(null);
   const [showDropdown, setShowDropdown] = useState(false);
+
+
+  useEffect(() => {
+    console.log("ToCurrencyData",toCurrencyData)
+    if (toCurrencyData) {
+      setToCurrency(toCurrencyData);
+    }
+  },[toCurrencyData]);
 
   const handleInputChange = (e:any) => {
     const value = e.target.value;
@@ -21,7 +37,7 @@ const CoinAddressInput = () => {
             value={inputValue}
             onChange={handleInputChange}
             className={`flex-grow px-6 py-2 sm:px-2 sm:py-4 bg-[rgba(0,0,0,0.5)] text-white rounded-l-md focus:outline-none `}
-            placeholder="Your Litecoin address"
+            placeholder={`Your ${toCurrency?.name} address`}
           />
           <div
             onClick={() => {
