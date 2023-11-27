@@ -180,7 +180,22 @@ export default function Home() {
         direction: !fromToCurrency.direction
       };
       setFromToCurrency(newFromToCurrencyData);
-      setIsFrom(!isFrom)
+      setIsFrom(!isFrom);
+      if(exchangeRateData){
+        const amount = exchangeRateData.data.to.amount;
+        setAmount(parseFloat(amount));
+
+        if(newFromToCurrencyData && amount) {
+          const newRequestData: ExchangeRateRequestData = {
+            type: isFixedRate ? "fixed" : "float",
+            fromCcy: newFromToCurrencyData.fromCurrency.code,
+            toCcy: newFromToCurrencyData.toCurrency.code,
+            direction: "from",
+            amount: parseFloat(amount)
+          }
+          onGetExchangeRate(newRequestData);
+        }
+      }
     }
   }
 
