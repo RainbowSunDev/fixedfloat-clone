@@ -138,7 +138,7 @@ export type CreateOrderResponse = {
     id: string;
     type: string;
     email: string;
-    status: string;
+    status: OrderStatus;
     time: TimeDetails;
     from: CurrencyDetails;
     to: CurrencyDetails;
@@ -146,3 +146,19 @@ export type CreateOrderResponse = {
     emergency?: EmergencyDetails;
   };
 };
+
+export type OrderDetailsRequest = {
+  id: string;
+  token: string;
+}
+export type QRCodeInfo = {
+  title: string;
+  src: string;
+  checked: boolean;
+};
+
+export type QrCodesResponse = {
+  code: number;
+  msg: string;
+  data: QRCodeInfo[];
+}

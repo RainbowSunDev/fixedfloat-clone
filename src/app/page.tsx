@@ -8,6 +8,8 @@ import OrderTypeToggle from '@/components/OrderTypeToggle';
 import { BsArrowRight, BsArrowLeft  } from 'react-icons/bs'
 import axios from 'axios';
 import { Currency, FromToCurrency, ExchangeRateRequestData, ExchangeRateResponseData, CreateOrderRequestData, CreateOrderResponse } from '@/types';
+import Loading from './loading';
+import { isNull } from 'lodash';
 
 const direction = "from"
 export default function Home() {
@@ -16,6 +18,7 @@ export default function Home() {
   const [amount, setAmount] = useState<number | null>(null);
   const [isFixedRate, setIsFixedRate] = useState(true);
   const [isFrom, setIsFrom] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [address, setAddress] = useState<string | null>(null);
 
   const [currencies, setCurrencies] = useState<Currency[] | null>(null);
@@ -284,7 +287,16 @@ export default function Home() {
   }
 
   const handleExchange = async () => {
-    
+    console.log("typeof amount", typeof amount)
+    if(isNull(amount)) {
+      alert("Enter exchange amount");
+      return;
+    }
+    if(isNull(address)) {
+      alert("Enter address");
+      return;
+    }
+    setIsLoading(true);
     let requestData: CreateOrderRequestData;
     if(fromToCurrency && amount && address) {
       requestData = {
@@ -296,6 +308,7 @@ export default function Home() {
         toAddress: address 
       }
     try {
+      localStorage.setItem('fromToCurrencyData', JSON.stringify(fromToCurrency));
       const response = await axios.post(
         '/api/create-order',
         {
@@ -313,6 +326,7 @@ export default function Home() {
         const url = `/order/${orderData.data.id}/?token=${orderData.data.token}`;
         router.push(url);
       }
+      setIsLoading(false);
 
       // Handle the response data
     } catch (error) {
@@ -390,9 +404,11 @@ export default function Home() {
 
               </div>
               <div className="mt-3 sm:mt-0">
-                  <button className="text-xs text-white sm:text-lg sm:font-bold py-3 px-10 sm:py-4 sm:px-12 bg-blue-500 hover:bg-blue-700  rounded transition-all" onClick={handleExchange}>
+                  {isLoading ? <button className="text-xs text-white sm:text-lg sm:font-bold py-3 px-10 sm:py-4 sm:px-12 bg-blue-500 hover:bg-blue-700  rounded transition-all" >
+                      Loading...
+                  </button> : <button className="text-xs text-white sm:text-lg sm:font-bold py-3 px-10 sm:py-4 sm:px-12 bg-blue-500 hover:bg-blue-700  rounded transition-all" onClick={handleExchange}>
                       Exchange now
-                  </button>
+                  </button>}
               </div>
           </div>
               </div>
