@@ -1,16 +1,18 @@
 'use client'
 import Image from 'next/image';
 import { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import CurrencyInputDropdown from '@/components/CurrencyInput';
 import CoinAddressInput from '@/components/CoinAddressInput';
 import OrderTypeToggle from '@/components/OrderTypeToggle';
 import { BsArrowRight, BsArrowLeft  } from 'react-icons/bs'
 import axios from 'axios';
-import { Currency, FromToCurrency, ExchangeRateRequestData, ExchangeRateResponseData, CreateOrderRequestData } from '@/types';
+import { Currency, FromToCurrency, ExchangeRateRequestData, ExchangeRateResponseData, CreateOrderRequestData, CreateOrderResponse } from '@/types';
 
 const direction = "from"
 export default function Home() {
 
+  const router = useRouter();
   const [amount, setAmount] = useState<number | null>(null);
   const [isFixedRate, setIsFixedRate] = useState(true);
   const [isFrom, setIsFrom] = useState(true);
@@ -282,7 +284,7 @@ export default function Home() {
   }
 
   const handleExchange = async () => {
-    console.log(address)
+    
     let requestData: CreateOrderRequestData;
     if(fromToCurrency && amount && address) {
       requestData = {
@@ -305,7 +307,13 @@ export default function Home() {
           },
         }
       );
-      console.log(response);
+      console.log(response.data);
+      const orderData: CreateOrderResponse = response.data;
+      if(orderData.code === 0) {
+        const url = `/order/${orderData.data.id}/?token=${orderData.data.token}`;
+        router.push(url);
+      }
+
       // Handle the response data
     } catch (error) {
       console.error('Error:', error);
