@@ -7,7 +7,6 @@ export async function POST(request: NextRequest) {
     try {
         const requestData = await request.json();
         const reqData = requestData as ExchangeRateRequestData;
-        console.log("reqdata:", reqData);
         const response = await getExchangeRateOfTokenPair(reqData);
         return NextResponse.json(response, { status: 200 });
     } catch (error) {

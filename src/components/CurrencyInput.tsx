@@ -9,14 +9,17 @@ type CurrencyInputDropdownProps = {
   selectedCurrency: Currency | null;
   currecyDetail: CurrencyDetail | null;
   type?: string;
+  direction: string;
   toCurrecyDetail: CurrencyDetail | null;
   onSwapCurrencies: () => void;
   onSetArrowColor: (color: string) => void;
   onSetCurrentCurrency: (currency: Currency) => void;
   onSetAmount: (amount: number) => void;
+  onSetDirection: (direction: string) => void;
+
 };
 
-const CurrencyInputDropdown = ({ currecyDetail, type, toCurrecyDetail, onSetCurrentCurrency, currencies, onSetArrowColor, selectedCurrency, onSetAmount }: CurrencyInputDropdownProps) => {
+const CurrencyInputDropdown = ({ currecyDetail, type, direction, toCurrecyDetail, onSetCurrentCurrency, currencies, onSetArrowColor, selectedCurrency, onSetAmount, onSetDirection }: CurrencyInputDropdownProps) => {
   // current my selected currency
   // const [selectedCurrency, setSelectedCurrency] = useState<Currency | null>(null);
   const [inputValue, setInputValue] = useState<string>('');
@@ -31,7 +34,6 @@ const CurrencyInputDropdown = ({ currecyDetail, type, toCurrecyDetail, onSetCurr
     // }
     // Filter currencies based on the search query
     const lowercasedQuery = searchQuery.toLowerCase();
-    console.log("ahahah:", currencies)
     if(currencies) {
       const filtered = currencies.filter(currency =>
         currency.name.toLowerCase().includes(lowercasedQuery)
@@ -56,8 +58,9 @@ const CurrencyInputDropdown = ({ currecyDetail, type, toCurrecyDetail, onSetCurr
     // onSetAmount(parseFloat(inputValue))
   };
 
-  const setProps = useCallback(debounce((data) => {
+  const setProps = useCallback(debounce((data, direction = "from") => {
     // props.setCrypto({amount: data, type: selection});
+    onSetDirection(direction)
     onSetAmount(parseFloat(data))
   }, 700), []);
 
@@ -72,6 +75,21 @@ const CurrencyInputDropdown = ({ currecyDetail, type, toCurrecyDetail, onSetCurr
       event.preventDefault();
     }
   };
+
+  const onSetMinValue = () => {
+    const value = currecyDetail?.min;
+    if(value) {
+      setInputValue(value);
+      setProps(value, direction)
+    }
+  }
+  const onSetMaxValue = () => {
+    const value = currecyDetail?.max;
+    if(value) {
+      setInputValue(value);
+      setProps(value, direction)
+    }
+  }
   const selectCurrencyColor = selectedCurrency ? selectedCurrency.color : '#ffffff';
 
   return (
@@ -121,7 +139,6 @@ const CurrencyInputDropdown = ({ currecyDetail, type, toCurrecyDetail, onSetCurr
                   handleCurrencyClick(currency);
                   setIsSelectActive(!isSelectActive);
                 } else if (currency.send && !type) {
-                  console.log("!type", !type)
                   handleCurrencyClick(currency);
                   setIsSelectActive(!isSelectActive);
                 }
@@ -148,6 +165,25 @@ const CurrencyInputDropdown = ({ currecyDetail, type, toCurrecyDetail, onSetCurr
         <div className="mt-2 text-xs text-purple-300 ">
           1 {selectedCurrency?.coin} ≈ {currecyDetail?.rate} {toCurrecyDetail?.coin}  
         </div>
+        <div className="flex flex-row items-center justify-between text-white mt-1 text-sm">
+          {/* min */}
+          <div className="">
+            <span className='text-slate-400'>min:</span>
+            <button className='hover:border-b-[1px] hover:mb-[-1px] mx-1 leading-tight' onClick={onSetMinValue}>
+              <span>{currecyDetail?.min}</span>
+              <span> {selectedCurrency?.coin}</span>
+            </button>
+          </div>
+          {/* max */}
+          <div className="">
+            <span className='text-slate-400'>max:</span>
+            <button className='hover:border-b-[1px] hover:mb-[-1px] mx-1 leading-tight' onClick={onSetMaxValue}>
+              <span>{currecyDetail?.max}</span>
+              <span> {selectedCurrency?.coin}</span>
+            </button>
+          </div>
+        </div>
+        
       </div>
     </div>
   );

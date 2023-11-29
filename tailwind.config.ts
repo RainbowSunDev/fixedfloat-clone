@@ -9,11 +9,11 @@ const config: Config = {
   theme: {
     extend: {
       animation: {
-        fadeIn: 'fadeIn 1s ease-in-out'
+        fadeIn: 'bounce 1s ease-in-out infinite'
       },
       keyframes: {
         fadeIn: {
-          '0%': { opacity: '0' },
+          '0%': { opacity: '0.5' },
           '100%': { opacity: '1' }
         }
       },

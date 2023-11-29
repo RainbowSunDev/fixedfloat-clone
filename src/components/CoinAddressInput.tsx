@@ -36,11 +36,9 @@ const CoinAddressInput = ({toCurrencyData, setAddress}: CoinAddressInputProps) =
 
       } else {
         console.error('Clipboard API not available.');
-        // Handle the unavailability of Clipboard API
       }
     } catch (error) {
       console.error('Error pasting text: ', error);
-      // Handle the error (for example, display a notification)
     }
   };
   return (

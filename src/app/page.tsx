@@ -9,11 +9,11 @@ import { Currency, FromToCurrency, ExchangeRateRequestData, ExchangeRateResponse
 import WAValidator from 'multicoin-address-validator'
 import Loading from './loading';
 
-const direction = "from"
 export default function Home() {
 
   const router = useRouter();
-  const [amount, setAmount] = useState<number | null>(null);
+  const [amount, setAmount] = useState<number | null>(1);
+  const [direction, setDirection] = useState<string>("from");
   const [isFixedRate, setIsFixedRate] = useState(true);
   const [isFrom, setIsFrom] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
@@ -38,7 +38,6 @@ export default function Home() {
             },
           }
         );
-        console.log("availableData:", response.data)
         setCurrencies(response.data);
         const fromToCurrencyInitialData: FromToCurrency = {
           fromCurrency: response.data[0],
@@ -49,6 +48,15 @@ export default function Home() {
         
         setFixedSelectedCurrencyColor(fromToCurrencyInitialData?.fromCurrency?.color);
         setFloatSelectedCurrencyColor(fromToCurrencyInitialData?.toCurrency?.color);
+        const reqData: ExchangeRateRequestData = {
+          type: isFixedRate ? "fixed" : "float",
+          fromCcy: fromToCurrencyInitialData.fromCurrency.code,
+          toCcy: fromToCurrencyInitialData.toCurrency.code,
+          direction: direction,
+          amount: 1
+        }
+        onGetExchangeRate(reqData);
+
         setIsLoading(false);
 
       } catch (error) {
@@ -56,10 +64,10 @@ export default function Home() {
       }
     }
     getAvailbaleCurrencies();
+
   }, [])
 
   const onGetExchangeRate = useCallback(async (requestData: ExchangeRateRequestData) => {
-    console.log("currencies3", currencies)
     try {
       setIsLoading(true);
 
@@ -75,8 +83,6 @@ export default function Home() {
           },
         }
       );
-      console.log("exchageData2----response", response.data)
-      console.log("currencies2", currencies)
       if(response.data?.data){
         setExchangeRateData(response.data)
       
@@ -100,7 +106,6 @@ export default function Home() {
         if(newCurrencies){
           setCurrencies(newCurrencies)
         }
-        console.error(newCurrencies)
       }
       setIsLoading(false);
       
@@ -110,8 +115,6 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    console.log("currencies66", currencies)
-    
     const onGetExchangeRate = async (requestData: ExchangeRateRequestData) => {
       try {
         setIsLoading(true);
@@ -129,7 +132,6 @@ export default function Home() {
             },
           }
         );
-        console.log("exchageData1----response", response.data)
 
         if(response.data?.data){
           setExchangeRateData(response.data)
@@ -154,7 +156,6 @@ export default function Home() {
           if(newCurrencies){
             setCurrencies(newCurrencies)
           }
-          console.error(newCurrencies)
         }
         setIsLoading(false);
 
@@ -217,7 +218,6 @@ export default function Home() {
   }
 
   const handleSetFromCurrency = (fromCurrency: Currency) => {
-    console.log("currencies11:", currencies)
     let newFromToCurrencyData: FromToCurrency;
     if(fromToCurrency && currencies) {
       const toCurrency = fromToCurrency.toCurrency;
@@ -237,7 +237,6 @@ export default function Home() {
           fromCurrency: fromCurrency
         };
       }
-      console.log("newFromToCurrencyData",newFromToCurrencyData)
       setFromToCurrency(newFromToCurrencyData);
 
       if(exchangeRateData){
@@ -249,7 +248,6 @@ export default function Home() {
             direction: direction,
             amount: amount
           }
-          console.log("currencies44:", currencies)
   
           onGetExchangeRate(newRequestData);
         }
@@ -334,7 +332,6 @@ export default function Home() {
           },
         }
       );
-      console.log(response.data);
       const orderData: CreateOrderResponse = response.data;
       if(orderData.code === 0) {
         const url = `/order/${orderData.data.id}/?token=${orderData.data.token}`;
@@ -349,7 +346,6 @@ export default function Home() {
   }
   }
 
-  console.log("address", address)
   return (
     <main className="w-screen ">
       <div className="flex flex-col items-center w-full h-screen relative">
@@ -367,10 +363,12 @@ export default function Home() {
                   currecyDetail={exchangeRateData && exchangeRateData.data.from}
                   toCurrecyDetail={exchangeRateData && exchangeRateData.data.to}
                   type="editable"
+                  direction="from"
                   onSwapCurrencies={handleSwapCurrencies}
                   onSetArrowColor={handleFixedCurrencyColor}
                   onSetCurrentCurrency={handleSetFromCurrency}
                   onSetAmount={setAmount}
+                  onSetDirection={setDirection}
                 />
                 <button className='text-lg sm:text-xl font-extrabold text-center mb-6 sm:mx-6' onClick={() => handleSwapCurrencies()}>
                   <div className={`ml-2  ${fromToCurrency?.fromCurrency?.color ?? "text-white"}`} style={{ color: fixedSelectedCurrencyColor }}>
@@ -389,6 +387,8 @@ export default function Home() {
                   onSetCurrentCurrency={handleSetToCurrency}
                   onSetAmount={setAmount}
                   toCurrecyDetail={exchangeRateData && exchangeRateData.data.from}
+                  onSetDirection={setDirection}
+                  direction="to"
 
                 />
               </div>

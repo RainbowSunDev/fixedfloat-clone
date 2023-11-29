@@ -7,7 +7,6 @@ export async function POST(request: NextRequest) {
     try {
         const requestData = await request.json();
         const reqData = requestData as CreateOrderRequestData;
-        console.log("reqdata:", reqData);
         const response = await getCreateOrderData(reqData);
         return NextResponse.json(response, { status: 200 });
     } catch (error) {
@@ -33,7 +32,6 @@ const getCreateOrderData = async (params = {}) : Promise<CreateOrderResponse> =>
 
     try {
         const response = await axios.post(url, data, { headers });
-        console.log("create order response.data:", response.data)
         return response.data;
     } catch (error) {
         throw new Error('Webhook error', { cause: error });

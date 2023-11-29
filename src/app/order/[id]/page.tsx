@@ -100,7 +100,6 @@ export default function Page({ params }: { params: { id: string } }) {
                       },
                     }
                   );
-                console.log("availableData:", response.data);
                 const orderData: CreateOrderResponse = response.data;
                 if(orderData.code === 0) {
                     setOrderDetails(orderData);
@@ -126,7 +125,6 @@ export default function Page({ params }: { params: { id: string } }) {
                       },
                     }
                   );
-                console.log("availableData:", response.data);
                 const orderData: QrCodesResponse = response.data;
                 if(orderData.code === 0) {
                     setQrCodes(orderData);
@@ -145,7 +143,6 @@ export default function Page({ params }: { params: { id: string } }) {
         }
 
         const tick = () => {
-            console.log("tick")
             setTimeLeft((prevTime) => (prevTime !== null && prevTime > 0 ? prevTime - 1 : 0));
         };
 
@@ -200,6 +197,7 @@ export default function Page({ params }: { params: { id: string } }) {
     const getStatusStyles = (status: OrderStatus) => {
         return statusToStyle[orderStatus][status];
     };
+
   return (
     <main className="w-screen">
         <section className="flex flex-col items-center w-full h-screen">
@@ -332,30 +330,35 @@ export default function Page({ params }: { params: { id: string } }) {
                             </div>
                         </div>
                    {/* progress part */}
-                   <div className="flex flex-row items-center justify-evenly mt-2 lg:mt-24">
+                   <div className="flex flex-row items-center justify-evenly mt-4 lg:mt-24 text-white">
                         <div className="flex flex-col items-center justify-center">
-                            <div className={`flex flex-row items-center justify-center rounded-full mr-1 w-10 h-10 sm:w-16 sm:h-16 lg:w-20 lg:h-20  text-6xl ${getStatusStyles("NEW")}`}>
+                            <div className={`flex flex-row items-center justify-center rounded-full mr-1 w-10 h-10 sm:w-16 sm:h-16 lg:w-20 lg:h-20  lg:text-6xl ${getStatusStyles("NEW")}`}>
                                 <BsFillCloudUploadFill />
                             </div>
-                            <span className='text-sm mt-2 text-center lg:mt-6 text-white lg:text-xl'>Awaiting deposit</span>
+                            <span className='text-xs mt-2 text-center lg:mt-6 text-white lg:text-xl'>Awaiting deposit</span>
                         </div>
+                        <div className='lg:text-3xl font-extrabold'><BsArrowRight /></div>
                         <div className="flex flex-col items-center justify-center">
-                            <div className={`flex flex-row items-center justify-center rounded-full mr-1 w-10 h-10 sm:w-16 sm:h-16 lg:w-20 lg:h-20 text-6xl ${getStatusStyles("PENDING")}`}>
+                            <div className={`flex flex-row items-center justify-center rounded-full mr-1 w-10 h-10 sm:w-16 sm:h-16 lg:w-20 lg:h-20 lg:text-6xl ${getStatusStyles("PENDING")}`}>
                                 <BsArrowRepeat />
                             </div>
-                            <span className='text-sm mt-2 text-center lg:mt-6 text-white lg:text-xl'>Awaiting confirmations</span>
+                            <span className='text-xs mt-2 text-center lg:mt-6 text-white lg:text-xl'>Awaiting confirmations</span>
                         </div>
+                        <div className='lg:text-3xl font-extrabold'><BsArrowRight /></div>
+
                         <div className="flex flex-col items-center justify-center">
-                            <div className={`flex flex-row items-center justify-center rounded-full mr-1 w-10 h-10 sm:w-16 sm:h-16 lg:w-20 lg:h-20 text-6xl ${getStatusStyles("EXCHANGE")}`}>
+                            <div className={`flex flex-row items-center justify-center rounded-full mr-1 w-10 h-10 sm:w-16 sm:h-16 lg:w-20 lg:h-20 lg:text-6xl ${getStatusStyles("EXCHANGE")}`}>
                                 <BsDistributeVertical />
                             </div>
-                            <span className='text-sm mt-2 text-center lg:mt-6 text-white lg:text-xl'>Perform exchange</span>
+                            <span className='text-xs mt-2 text-center lg:mt-6 text-white lg:text-xl'>Perform exchange</span>
                         </div>
+                        <div className='lg:text-3xl font-extrabold'><BsArrowRight /></div>
+
                         <div className="flex flex-col items-center justify-center">
-                            <div className={`flex flex-row items-center justify-center rounded-full mr-1 w-10 h-10 sm:w-16 sm:h-16 lg:w-20 lg:h-20  text-6xl ${getStatusStyles("DONE")}`}>
+                            <div className={`flex flex-row items-center justify-center rounded-full mr-1 w-10 h-10 sm:w-16 sm:h-16 lg:w-20 lg:h-20  lg:text-6xl ${getStatusStyles("DONE")}`}>
                                 <BsCheckLg />
                             </div>
-                            <span className='text-sm mt-2 text-center lg:mt-6 text-white lg:text-xl'>Successfully Done</span>
+                            <span className='text-xs mt-2 text-center lg:mt-6 text-white lg:text-xl'>Successfully Done</span>
                         </div>
                         
                    </div>
