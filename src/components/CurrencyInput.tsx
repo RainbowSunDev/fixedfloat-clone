@@ -1,6 +1,6 @@
 import React, { useState, useEffect, KeyboardEvent, useCallback } from 'react';
 import Image from 'next/image';
-import { Currency, CurrencyDetail } from '@/types';
+import { Currency, CurrencyDetail, ExchangeRateResponseData } from '@/types';
 import { debounce } from "lodash"
 
 // Define a type for the component props
@@ -8,14 +8,15 @@ type CurrencyInputDropdownProps = {
   currencies: Currency[] | null;
   selectedCurrency: Currency | null;
   currecyDetail: CurrencyDetail | null;
-  type?: string
+  type?: string;
+  toCurrecyDetail: CurrencyDetail | null;
   onSwapCurrencies: () => void;
   onSetArrowColor: (color: string) => void;
   onSetCurrentCurrency: (currency: Currency) => void;
   onSetAmount: (amount: number) => void;
 };
 
-const CurrencyInputDropdown = ({ currecyDetail, type, onSetCurrentCurrency, currencies, onSetArrowColor, selectedCurrency, onSetAmount }: CurrencyInputDropdownProps) => {
+const CurrencyInputDropdown = ({ currecyDetail, type, toCurrecyDetail, onSetCurrentCurrency, currencies, onSetArrowColor, selectedCurrency, onSetAmount }: CurrencyInputDropdownProps) => {
   // current my selected currency
   // const [selectedCurrency, setSelectedCurrency] = useState<Currency | null>(null);
   const [inputValue, setInputValue] = useState<string>('');
@@ -145,7 +146,7 @@ const CurrencyInputDropdown = ({ currecyDetail, type, onSetCurrentCurrency, curr
           </ul>
         )}
         <div className="mt-2 text-xs text-purple-300 ">
-          1 {selectedCurrency?.name} ≈ 0.0000 ETH $0.00 {/* Replace with dynamic values */}
+          1 {selectedCurrency?.coin} ≈ {currecyDetail?.rate} {toCurrecyDetail?.coin}  
         </div>
       </div>
     </div>

@@ -206,18 +206,18 @@ export default function Page({ params }: { params: { id: string } }) {
             <div className="bg-dashboardbg bg-bottom bg-cover bg-no-repeat w-screen h-screen absolute"></div>
         
             <div className="z-10">
-                <div className="p-2 lg:p-0 lg:w-full ">
+                <div className="p-1 lg:p-0 lg:w-full ">
                    {/* token pair section */}
-                   <div className="flex flex-row items-center justify-center w-full lg:mt-16 bg-[rgba(0,0,0,0.5)] py-2 lg:py-6 text-white rounded-md">
+                   <div className="flex flex-row items-center justify-center w-full lg:mt-16 bg-[rgba(0,0,0,0.5)] p-2 lg:py-6 text-white rounded-md">
                         {/* first token part */}
-                        <div className="flex flex-row items-center">
+                        <div className="flex flex-row items-center justify-center w-[45%]">
                             {/* detail part */}
-                            <div className="flex flex-col justify-end items-end">
+                            <div className="flex flex-col justify-end items-end ">
                                 <p className='text-[10px] lg:text-xs text-slate-400'>YOU SEND</p>
-                                <p className={`text-sm lg:text-xl`} style={{color: fromToCurrency?.fromCurrency.color}}>{fromCurrency?.amount} {fromCurrency?.coin}</p>
-                                <p className='hidden lg:block text-xs'>{fromCurrency?.address}</p>
+                                <p className={`text-sm text-right lg:text-xl`} style={{color: fromToCurrency?.fromCurrency.color}}>{fromCurrency?.amount} {fromCurrency?.coin}</p>
+                                <p className='hidden lg:block text-xs break-all overflow-hidden'>{fromCurrency?.address}</p>
                             </div>
-                            <div className="mr-1 w-10 h-10 sm:w-16 sm:h-16 lg:w-20 lg:h-20">
+                            <div className="ml-1 w-10 h-10 sm:w-16 sm:h-16 lg:w-20 lg:h-20">
                                 <Image 
                                     src={fromToCurrency.fromCurrency.logo} 
                                     width={40} 
@@ -228,11 +228,11 @@ export default function Page({ params }: { params: { id: string } }) {
                             </div>
                         </div>
                         {/* arrow */}
-                        <div className={`text-white mr-4`}>
+                        <div className={`flex flex-row items-center text-2xl justify-center text-white w-[10%]`}>
                             <BsArrowRight /> 
                         </div>
-                        {/* first token part */}
-                        <div className="flex flex-row items-center">
+                        {/* second token part */}
+                        <div className="flex flex-row items-center w-[45%]">
                             <div className="mr-1 w-10 h-10 sm:w-16 sm:h-16 lg:w-20 lg:h-20">
                                 <Image 
                                     src={fromToCurrency?.toCurrency.logo} 
@@ -246,7 +246,7 @@ export default function Page({ params }: { params: { id: string } }) {
                             <div className="flex flex-col">
                                 <p className='text-[10px] lg:text-xs text-slate-400'>YOU RECEIVE</p>
                                 <p className='text-sm lg:text-xl' style={{color: fromToCurrency?.toCurrency.color}}>{toCurrency?.amount} {toCurrency?.coin}</p>
-                                <p className='hidden lg:block text-xs'>{toCurrency?.address}</p>
+                                <p className='hidden lg:block text-xs break-words'>{toCurrency?.address}</p>
                             </div>
                         </div>
                    </div>
@@ -274,15 +274,15 @@ export default function Page({ params }: { params: { id: string } }) {
                         {/* Middle section */}
                         <div className="hidden lg:block ml-4 p-6 bg-[rgba(0,0,0,0.5)] lg:w-2/3 h-[260px]">
                             <p className='text-sm text-slate-400'>Send <span className={`text-lg text-white`} style={{color: fromToCurrency?.fromCurrency.color}}>0.00345434 BTC</span> to the address</p>
-                            <div className='text-white text-lg'>{fromCurrency?.address}</div>
-                            <div className='mt-10 text-sm text-slate-400'>The exchange rate will be fixed after receiving  network confirmations</div>
-                            <div className="border-t-[1px] border-[rgba(135,159,171,0.31)] mt-8 py-4">
+                            <div className='text-white text-lg break-all'>{fromCurrency?.address}</div>
+                            <div className='mt-4 text-sm text-slate-400'>The exchange rate will be fixed after receiving  network confirmations</div>
+                            <div className="border-t-[1px] border-[rgba(135,159,171,0.31)] mt-8 py-4 w-1/2">
                                 <p className='text-sm text-slate-400'>Receiving address ETH</p>
-                                <p className='text-sm font-bold mt-2'>{toCurrency?.address}</p>
+                                <p className='text-sm font-bold mt-2 break-all'>{toCurrency?.address}</p>
                             </div>
                         </div>
                         <div className="flex flex-row items-start justify-center lg:mx-2 lg:ml-4 w-[180px] h-[200px] lg:w-[260px] lg:h-[260px] bg-slate-200 relative">
-                            {activeTab === 'address'  && <div className="mb-4 w-[170px] h-[170px] lg:w-fit lg:h-fit lg:mb-1">
+                            {activeTab === 'address'  && <div className="mb-4 w-[170px] h-[170px] lg:w-[220px] lg:h-[220px] lg:mb-1">
                                 {/* <QRCode value="Your value here" size={200} /> */}
                                 <Image 
                                     src={addressQrCode ? addressQrCode.src : ""} 
@@ -292,7 +292,7 @@ export default function Page({ params }: { params: { id: string } }) {
                                     layout="responsive"
                                 />
                             </div>}
-                            {activeTab === 'amount' && <div className="mb-4 w-[170px] h-[170px] lg:w-fit lg:h-fit lg:mb-1">
+                            {activeTab === 'amount' && <div className="mb-4 w-[170px] h-[170px] lg:w-[220px] lg:h-[220px] lg:mb-1">
                                 {/* <QRCode value="Your value here" size={200} /> */}
                                 <Image 
                                     src={amountQrCode ? amountQrCode.src : ""} 
@@ -324,7 +324,7 @@ export default function Page({ params }: { params: { id: string } }) {
                    {/* responsive middle section */}
                    <div className="block lg:hidden bg-[rgba(0,0,0,0.5)] p-4">
                             <p className='text-xs text-slate-400'>Send <span className={`text-sm text-white`} style={{color: fromToCurrency?.fromCurrency.color}}>0.00345434 BTC</span> to the address</p>
-                            <div className='text-white text-xs min-w-fit'>{fromCurrency?.address}</div>
+                            <div className='text-white text-xs min-w-fit break-all'>{fromCurrency?.address}</div>
                             <div className='mt-4 text-xs text-slate-400'>The exchange rate will be fixed after receiving  network confirmations</div>
                             <div className="border-t-[1px] border-[rgba(135,159,171,0.31)] mt-4 py-2">
                                 <p className='text-xs text-slate-400'>Receiving address ETH</p>
@@ -332,7 +332,7 @@ export default function Page({ params }: { params: { id: string } }) {
                             </div>
                         </div>
                    {/* progress part */}
-                   <div className="flex flex-row items-center justify-evenly mt-8 lg:mt-24">
+                   <div className="flex flex-row items-center justify-evenly mt-2 lg:mt-24">
                         <div className="flex flex-col items-center justify-center">
                             <div className={`flex flex-row items-center justify-center rounded-full mr-1 w-10 h-10 sm:w-16 sm:h-16 lg:w-20 lg:h-20  text-6xl ${getStatusStyles("NEW")}`}>
                                 <BsFillCloudUploadFill />
@@ -359,8 +359,8 @@ export default function Page({ params }: { params: { id: string } }) {
                         </div>
                         
                    </div>
-                   { orderStatus === "DONE" ? (<div className="flex flex-row items-center justify-center text-xs text-white py-1 mt-6 lg:mt-8 bg-red-500 rounded-md">
-                        <div className='w-1/6'>
+                   { orderStatus === "DONE" || orderStatus === "EXPIRED" ? (<div className="flex flex-row items-center justify-center text-xs text-white ">
+                        <div className='flex flex-row items-center justify-center w-full lg:w-1/6 bg-red-500 rounded-md py-1 mt-1 lg:py-2 lg:mt-12 '>
                             <Link href={'/'}>back to</Link>
                         </div>
                    </div>) : ""}

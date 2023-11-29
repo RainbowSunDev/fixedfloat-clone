@@ -1,15 +1,12 @@
 'use client'
-import Image from 'next/image';
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import CurrencyInputDropdown from '@/components/CurrencyInput';
 import CoinAddressInput from '@/components/CoinAddressInput';
-import OrderTypeToggle from '@/components/OrderTypeToggle';
 import { BsArrowRight, BsArrowLeft  } from 'react-icons/bs'
 import axios from 'axios';
 import { Currency, FromToCurrency, ExchangeRateRequestData, ExchangeRateResponseData, CreateOrderRequestData, CreateOrderResponse } from '@/types';
-import Loading from './loading';
-import { isNull } from 'lodash';
+import WAValidator from 'multicoin-address-validator'
 
 const direction = "from"
 export default function Home() {
@@ -113,7 +110,8 @@ export default function Home() {
           '/api/get-exchange-rate',
           {
             ...requestData,
-            ccies: true
+            ccies: true,
+            usd: false
           },
           {
             headers: {
@@ -287,13 +285,17 @@ export default function Home() {
   }
 
   const handleExchange = async () => {
-    console.log("typeof amount", typeof amount)
-    if(isNull(amount)) {
+    if(!amount) {
       alert("Enter exchange amount");
       return;
     }
-    if(isNull(address)) {
+    if(!address) {
       alert("Enter address");
+      return;
+    }
+    const valid = WAValidator.validate(address, fromToCurrency?.toCurrency.coin);
+    if(!valid) {
+      alert("Invalid wallet address")
       return;
     }
     setIsLoading(true);
@@ -334,6 +336,8 @@ export default function Home() {
     }
   }
   }
+
+  console.log("address", address)
   return (
     <main className="w-screen ">
       <div className="flex flex-col items-center w-full h-screen relative">
@@ -348,6 +352,7 @@ export default function Home() {
                   currencies={currencies} 
                   selectedCurrency={fromToCurrency && fromToCurrency.fromCurrency}
                   currecyDetail={exchangeRateData && exchangeRateData.data.from}
+                  toCurrecyDetail={exchangeRateData && exchangeRateData.data.to}
                   type="editable"
                   onSwapCurrencies={handleSwapCurrencies}
                   onSetArrowColor={handleFixedCurrencyColor}
@@ -370,6 +375,7 @@ export default function Home() {
                   onSetArrowColor={handleFloatCurrencyColor}
                   onSetCurrentCurrency={handleSetToCurrency}
                   onSetAmount={setAmount}
+                  toCurrecyDetail={exchangeRateData && exchangeRateData.data.from}
 
                 />
               </div>
