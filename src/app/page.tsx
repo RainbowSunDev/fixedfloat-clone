@@ -7,6 +7,7 @@ import { BsArrowRight, BsArrowLeft  } from 'react-icons/bs'
 import axios from 'axios';
 import { Currency, FromToCurrency, ExchangeRateRequestData, ExchangeRateResponseData, CreateOrderRequestData, CreateOrderResponse } from '@/types';
 import WAValidator from 'multicoin-address-validator'
+import Loading from './loading';
 
 const direction = "from"
 export default function Home() {
@@ -27,6 +28,8 @@ export default function Home() {
   useEffect(() => {
     const getAvailbaleCurrencies = async () => {
       try {
+        setIsLoading(true);
+
         const response = await axios.get(
           '/api/get-available-token',
           {
@@ -46,6 +49,8 @@ export default function Home() {
         
         setFixedSelectedCurrencyColor(fromToCurrencyInitialData?.fromCurrency?.color);
         setFloatSelectedCurrencyColor(fromToCurrencyInitialData?.toCurrency?.color);
+        setIsLoading(false);
+
       } catch (error) {
         console.error("error", error)
       }
@@ -56,6 +61,8 @@ export default function Home() {
   const onGetExchangeRate = useCallback(async (requestData: ExchangeRateRequestData) => {
     console.log("currencies3", currencies)
     try {
+      setIsLoading(true);
+
       const response = await axios.post(
         '/api/get-exchange-rate',
         {
@@ -95,6 +102,7 @@ export default function Home() {
         }
         console.error(newCurrencies)
       }
+      setIsLoading(false);
       
     } catch (error) {
       console.error("error", error)
@@ -106,6 +114,8 @@ export default function Home() {
     
     const onGetExchangeRate = async (requestData: ExchangeRateRequestData) => {
       try {
+        setIsLoading(true);
+
         const response = await axios.post(
           '/api/get-exchange-rate',
           {
@@ -146,6 +156,8 @@ export default function Home() {
           }
           console.error(newCurrencies)
         }
+        setIsLoading(false);
+
       } catch (error) {
         console.error("error", error)
       }
@@ -342,6 +354,7 @@ export default function Home() {
     <main className="w-screen ">
       <div className="flex flex-col items-center w-full h-screen relative">
         <div className="bg-dashboardbg bg-bottom bg-cover bg-no-repeat w-screen h-screen absolute"></div>
+        <div className="bg-dashboardbg bg-bottom bg-cover bg-no-repeat w-screen h-screen absolute">{isLoading && <Loading />}</div>
         
         <div className="flex flex-row items-center justify-center z-10">
           <div className="my-6 sm:my-[60px] ">
@@ -411,7 +424,7 @@ export default function Home() {
               </div>
               <div className="mt-3 sm:mt-0">
                   {isLoading ? <button className="text-xs text-white sm:text-lg sm:font-bold py-3 px-10 sm:py-4 sm:px-12 bg-blue-500 hover:bg-blue-700  rounded transition-all" >
-                      Loading...
+                      loading ...
                   </button> : <button className="text-xs text-white sm:text-lg sm:font-bold py-3 px-10 sm:py-4 sm:px-12 bg-blue-500 hover:bg-blue-700  rounded transition-all" onClick={handleExchange}>
                       Exchange now
                   </button>}
