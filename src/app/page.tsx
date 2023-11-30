@@ -8,8 +8,10 @@ import axios from 'axios';
 import { Currency, FromToCurrency, ExchangeRateRequestData, ExchangeRateResponseData, CreateOrderRequestData, CreateOrderResponse } from '@/types';
 import WAValidator from 'multicoin-address-validator'
 import Loading from './loading';
+import Modal from '@/components/Modal';
 
 export default function Home() {
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
 
   const router = useRouter();
   const [amount, setAmount] = useState<number | null>(1);
@@ -346,12 +348,21 @@ export default function Home() {
   }
   }
 
+  const handleQuestion = () => {
+    console.log("ddd")
+    setIsModalOpen(true)
+  }
+  console.log(isModalOpen)
   return (
     <main className="w-screen ">
       <div className="flex flex-col items-center w-full h-screen relative">
-        <div className="bg-dashboardbg bg-bottom bg-cover bg-no-repeat w-screen h-screen absolute"></div>
+        <div className="bg-dashboardbg bg-bottom bg-cover bg-no-repeat w-screen h-screen absolute">
+          {isModalOpen && <Modal 
+            // children={}
+            setModalVisibility={setIsModalOpen}
+          />}
+        </div>
         <div className="bg-dashboardbg bg-bottom bg-cover bg-no-repeat w-screen h-screen absolute">{isLoading && <Loading />}</div>
-        
         <div className="flex flex-row items-center justify-center z-10">
           <div className="my-6 sm:my-[60px] ">
             <h1 className='text-center text-xl sm:text-[2em] md:text-[2.6em] font-semibold text-white'>Lightning cryptocurrency exchange</h1>
@@ -417,7 +428,7 @@ export default function Home() {
                       </button>
                   </div>
                   <div className="flex flex-row items-center justify-start mt-1 sm:mt-0">
-                      <button className="rounded-full text-white w-6 h-6 bg-[rgba(0,0,0,0.5)] ">?</button>
+                      <button onClick={handleQuestion} className="rounded-full text-white w-6 h-6 bg-[rgba(0,0,0,0.5)] ">?</button>
                       <span className='block sm:hidden text-slate-300 text-xs'>What is the difference?</span>
                   </div>
 
@@ -435,7 +446,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-        <div className='flex flex-wrap justify-center sm:block sm:px-16 sm:mt-4 text-slate-400 text-[10px] sm:text-sm z-10'>
+        <div className='flex flex-wrap justify-center sm:block sm:px-16 sm:mt-4 text-slate-400 text-[10px] sm:text-sm z-[2]'>
           <span>By using the site and creating an exchange, you agree to the FixedFloat`s</span>
           <span className="">
             <a className="text-blue-500 hover:border-b-[1px] hover:border-blue-500" href="http://"> Terms of Sevices</a>

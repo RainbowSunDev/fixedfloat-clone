@@ -1,8 +1,8 @@
 import React, { useState, useEffect, KeyboardEvent, useCallback } from 'react';
 import Image from 'next/image';
 import { Currency, CurrencyDetail, ExchangeRateResponseData } from '@/types';
-import { debounce } from "lodash"
-
+import { debounce, divide } from "lodash"
+import { IoWarningOutline } from 'react-icons/io5';
 // Define a type for the component props
 type CurrencyInputDropdownProps = {
   currencies: Currency[] | null;
@@ -27,6 +27,8 @@ const CurrencyInputDropdown = ({ currecyDetail, type, direction, toCurrecyDetail
   const [filteredCurrencies, setFilteredCurrencies] = useState<Currency[] | null>(currencies);
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
   const [isSelectActive, setIsSelectActive] = useState<boolean>(false);
+  const [showTooltip, setShowTooltip] = useState<boolean>(false);
+  const [isExceed, setIsExceed] = useState<boolean>(false);
 
   useEffect(() => {
     // if (fromToCurrency) {
@@ -45,6 +47,16 @@ const CurrencyInputDropdown = ({ currecyDetail, type, direction, toCurrecyDetail
   useEffect(() => {
     if(currecyDetail){
       setInputValue(currecyDetail.amount);
+      setShowTooltip(false)
+
+      if(currecyDetail && parseFloat(currecyDetail.amount) > parseFloat(currecyDetail.max)) {
+        setShowTooltip(true)
+        setIsExceed(true)
+      } else if (currecyDetail && parseFloat(currecyDetail.amount) < parseFloat(currecyDetail.min)) {
+        setShowTooltip(true)
+        setIsExceed(false)
+  
+      } 
     }
     
   }, [currecyDetail]);
@@ -68,6 +80,18 @@ const CurrencyInputDropdown = ({ currecyDetail, type, direction, toCurrecyDetail
     const value = e.target.value;
     setInputValue(value);
     setProps(value)
+    // if(currecyDetail && parseFloat(value) > parseFloat(currecyDetail.max)) {
+    //   setShowTooltip(true)
+    //   setIsExceed(true)
+    // } else if (currecyDetail && parseFloat(value) < parseFloat(currecyDetail.min)) {
+    //   setShowTooltip(true)
+    //   setIsExceed(false)
+
+    // } else {
+    //   setShowTooltip(false)
+    //   setInputValue(value);
+    //   setProps(value)
+    // }
   };
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     // Prevent 'e', 'E', '+', '-', and '.' from being entered
@@ -129,6 +153,36 @@ const CurrencyInputDropdown = ({ currecyDetail, type, direction, toCurrecyDetail
             <span className="text-xs sm:ml-2">▼</span>
           </button>
         </div>
+        {showTooltip && isExceed && type &&
+          <div className="relative flex items-center transition-all">
+            <div className="absolute top-full left-0 mt-1 w-80 bg-[#a90707] text-white text-sm rounded-lg p-2">
+              <div className="flex items-center">
+                <IoWarningOutline className="text-xl" />
+                <span className="ml-1">You exceeded the limit</span>
+                <button className='hover:border-b-[1px] hover:mb-[-1px] mx-1 leading-tight' onClick={onSetMaxValue}>
+                  <span>{currecyDetail?.max}</span>
+                  <span> {selectedCurrency?.coin}</span>
+                </button>
+              </div>
+              <div className="absolute left-2 top-[-10px] w-0 h-0 border-x-transparent border-x-8 border-b-8 border-b-red-600"></div>
+            </div>
+          </div>
+        }
+        {showTooltip && !isExceed && type &&
+          <div className="relative flex items-center transition-all">
+            <div className="absolute top-full left-0 mt-1 w-80 bg-[#a90707] text-white text-sm rounded-lg p-2">
+              <div className="flex items-center">
+                <IoWarningOutline className="text-xl" />
+                <span className="ml-1">Minimum amount</span>
+                <button className='hover:border-b-[1px] hover:mb-[-1px] mx-1 leading-tight' onClick={onSetMinValue}>
+                  <span>{currecyDetail?.min}</span>
+                  <span> {selectedCurrency?.coin}</span>
+                </button>
+              </div>
+              <div className="absolute left-2 top-[-10px] w-0 h-0 border-x-transparent border-x-8 border-b-8 border-b-red-600"></div>
+            </div>
+          </div>
+        }
         {showDropdown && (
           <ul className="absolute w-full max-h-72 bg-[#29315C] rounded-b-md shadow-lg z-50 overflow-y-auto">
             {filteredCurrencies && filteredCurrencies.map((currency, index) => (
