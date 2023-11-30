@@ -297,6 +297,17 @@ export default function Home() {
   }
 
   const handleExchange = async () => {
+    const response = await axios.post(
+      '/api/create-order',
+      {
+        code:"dddd"
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
     if(!amount) {
       alert("Enter exchange amount");
       return;
