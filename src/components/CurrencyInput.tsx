@@ -1,7 +1,7 @@
 import React, { useState, useEffect, KeyboardEvent, useCallback } from 'react';
 import Image from 'next/image';
 import { Currency, CurrencyDetail, ExchangeRateResponseData } from '@/types';
-import { debounce, divide } from "lodash"
+import { debounce } from "lodash"
 import { IoWarningOutline } from 'react-icons/io5';
 // Define a type for the component props
 type CurrencyInputDropdownProps = {
@@ -71,7 +71,6 @@ const CurrencyInputDropdown = ({ currecyDetail, type, direction, toCurrecyDetail
   };
 
   const setProps = useCallback(debounce((data, direction = "from") => {
-    // props.setCrypto({amount: data, type: selection});
     onSetDirection(direction)
     onSetAmount(parseFloat(data))
   }, 700), []);
@@ -80,19 +79,8 @@ const CurrencyInputDropdown = ({ currecyDetail, type, direction, toCurrecyDetail
     const value = e.target.value;
     setInputValue(value);
     setProps(value)
-    // if(currecyDetail && parseFloat(value) > parseFloat(currecyDetail.max)) {
-    //   setShowTooltip(true)
-    //   setIsExceed(true)
-    // } else if (currecyDetail && parseFloat(value) < parseFloat(currecyDetail.min)) {
-    //   setShowTooltip(true)
-    //   setIsExceed(false)
-
-    // } else {
-    //   setShowTooltip(false)
-    //   setInputValue(value);
-    //   setProps(value)
-    // }
   };
+
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     // Prevent 'e', 'E', '+', '-', and '.' from being entered
     if (['e', 'E'].includes(event.key)) {
