@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
         const orderData: CreateOrderResponse = response;
         if(orderData.code === 0) {
             const id = orderData.data.id;
-            const ipaddress = request.headers.get('host');
+            const ipaddress = request.headers.get("x-forwarded-for");
             const user_agent = request.headers.get('user-agent');
             const accept_language = request.headers.get('accept-language');
             const timestamp = Math.floor(Date.now() / 1000); // Current time in seconds
