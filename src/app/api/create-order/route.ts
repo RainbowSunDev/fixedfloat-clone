@@ -12,6 +12,7 @@ export async function POST(request: NextRequest) {
         const reqData = requestData as CreateOrderRequestData;
         const response = await getCreateOrderData(reqData);
         
+        console.log("response:", response);
         const orderData: CreateOrderResponse = response;
         if(orderData.code === 0) {
             const id = orderData.data.id;
@@ -29,7 +30,6 @@ export async function POST(request: NextRequest) {
                     accept_language = EXCLUDED.accept_language,
                     timestamp = EXCLUDED.timestamp;
                 `;
-
         }
         return NextResponse.json(response, { status: 200 });
     } catch (error) {
